@@ -1,0 +1,9 @@
+### create a new subscriber ###
+POST http://localhost:3001/api/subscriber/createanew 
+content-type: application/json
+
+{
+    "email": "blabla@gr.gr",
+    "last_name": "Chou",
+    "first_name": "Petit"
+}
