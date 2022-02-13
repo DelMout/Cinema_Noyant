@@ -1,28 +1,26 @@
+const { Sequelize } = require(".");
+
 module.exports = (sequelize, DataTypes) => {
-	const subscriber = sequelize.define(
-		"subscriber",
+	const information = sequelize.define(
+		"information",
 		{
-			email: {
+			item: {
 				type: DataTypes.STRING,
 				allowNull: false,
 				unique: true,
-				validate: {
-					isEmail: true,
-					notEmpty: true,
-				},
 			},
-			last_name: {
-				type: DataTypes.STRING,
-				allowNull: false,
-			},
-			first_name: {
+			title: {
 				type: DataTypes.STRING,
 				allowNull: true,
+			},
+			content: {
+				type: DataTypes.STRING,
+				allowNull: false,
 			},
 		},
 		{
 			timestamps: false,
 		}
 	);
-	return subscriber;
+	return information;
 };

@@ -1,28 +1,27 @@
 module.exports = (sequelize, DataTypes) => {
-	const subscriber = sequelize.define(
-		"subscriber",
+	const category = sequelize.define(
+		"category",
 		{
-			email: {
-				type: DataTypes.STRING,
-				allowNull: false,
-				unique: true,
-				validate: {
-					isEmail: true,
-					notEmpty: true,
-				},
-			},
-			last_name: {
+			category: {
 				type: DataTypes.STRING,
 				allowNull: false,
 			},
-			first_name: {
+			cloture_day: {
 				type: DataTypes.STRING,
-				allowNull: true,
+				allowNull: false,
+			},
+			class: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			priority: {
+				type: DataTypes.TINYINT,
+				allowNull: false,
 			},
 		},
 		{
 			timestamps: false,
 		}
 	);
-	return subscriber;
+	return category;
 };

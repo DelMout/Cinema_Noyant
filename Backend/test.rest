@@ -1,9 +1,83 @@
 ### create a new subscriber ###
-POST http://localhost:3001/api/subscriber/createanew 
+POST http://localhost:3001/api/subscriber/create
+content-type: application/json
+
+
+{
+    "email": "dlphn@hotmail.fr",
+    "last_name": "Mouto",
+    "first_name": "Delphine"
+}
+
+### see all subscribers ###
+GET http://localhost:3001/api/subscriber/getallsubs 
+
+### create a new volunteer ###
+POST http://localhost:3001/api/volunteer/create
+content-type: application/json
+
+
+{
+    "email": "dlphn@hotmail.fr",
+    "last_name": "Mout",
+    "first_name": "Delphine",
+    "password":"DDDddd1111"
+}
+
+### see all volunteers ###
+GET http://localhost:3001/api/volunteer/getallvolunteers 
+
+### Login for a  volunteer ###
+POST http://localhost:3001/api/volunteer/login
+content-type: application/json
+
+
+{
+    "email": "dd@dgg.gg",
+    "password":"DDDddd1111"
+}
+
+### Modify the password ###
+PUT http://localhost:3001/api/volunteer/password/6eUngPgtPOkCYnvB5VLeBFZRs
+content-type: application/json
+
+
+{
+    "password":"DDDddd1111"
+}
+
+### Send a email for forgotten password ###
+POST http://localhost:3001/api/volunteer/emailpassword/dlphn@hotmail.fr
+
+### Send a email to all volunteers ###
+POST http://localhost:3001/api/volunteer/emailinfo
 content-type: application/json
 
 {
-    "email": "blabla@gr.gr",
-    "last_name": "Chou",
-    "first_name": "Petit"
+    "title":"Dernière séance",
+    "content":"Retrouvons nous à cet horaire et à l'heure !"
 }
+
+### Send a email to all subscribers ###
+POST http://localhost:3001/api/subscriber/sendemail
+content-type: application/json
+
+{
+    "title":"Votre prochaine séance",
+    "content":"Le prochain film sera diffusé le Vendredi 6 Mars à 20h30."
+}
+
+### Create a new session ###
+POST http://localhost:3001/api/session/create
+content-type: application/json
+
+{
+    "date":"2022-03-20",
+    "time":"20h30"
+}
+
+### see all sessions ###
+GET http://localhost:3001/api/session/getallsessions 
+
+### Delete a session ###
+DELETE http://localhost:3001/api/session/delete/1 

@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-	const subscriber = sequelize.define(
-		"subscriber",
+	const volunteer = sequelize.define(
+		"volunteer",
 		{
 			email: {
 				type: DataTypes.STRING,
@@ -17,12 +17,28 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			first_name: {
 				type: DataTypes.STRING,
-				allowNull: true,
+				allowNull: false,
+			},
+			password: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				validate: {
+					notEmpty: true,
+				},
+			},
+			jeton: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				unique: true,
+			},
+			isAdmin: {
+				type: DataTypes.TINYINT,
+				defaultValue: 0,
 			},
 		},
 		{
 			timestamps: false,
 		}
 	);
-	return subscriber;
+	return volunteer;
 };
