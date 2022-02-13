@@ -11,6 +11,7 @@ const productRoutes = require("./routes/product");
 const subscriberRoutes = require("./routes/subscriber");
 const volunteerRoutes = require("./routes/volunteer");
 const sessionRoutes = require("./routes/session");
+const availabilityRoutes = require("./routes/availability");
 // const producerRoutes = require("./routes/producer");
 // const categoryRoutes = require("./routes/category");
 // const orderRoutes = require("./routes/order");
@@ -22,6 +23,7 @@ const { product } = require("./models");
 const { subscriber } = require("./models");
 const { volunteer } = require("./models");
 const { session } = require("./models");
+const { availability } = require("./models");
 // const { producer } = require("./models");
 // const { category } = require("./models");
 // const { order } = require("./models");
@@ -33,11 +35,11 @@ const { session } = require("./models");
 // order.belongsTo(product);
 // module.exports = { product, order };
 
-//association tables producer/product et category/product
-// product.belongsTo(producer);
-// module.exports = { producer, product };
-// product.belongsTo(category);
-// module.exports = { category, product };
+//association tables volunteer/availability et session/availability
+availability.belongsTo(volunteer);
+module.exports = { volunteer, availability };
+availability.belongsTo(session);
+module.exports = { session, availability };
 
 app.use(cors()); // Security CORS
 
@@ -63,6 +65,9 @@ app.use("/api/volunteer", volunteerRoutes);
 
 // * Session
 app.use("/api/session", sessionRoutes);
+
+// * availability
+app.use("/api/availability", availabilityRoutes);
 
 // * Producer
 // app.use("/api/producer", producerRoutes);

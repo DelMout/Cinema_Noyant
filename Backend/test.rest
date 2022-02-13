@@ -81,3 +81,12 @@ GET http://localhost:3001/api/session/getallsessions
 
 ### Delete a session ###
 DELETE http://localhost:3001/api/session/delete/1 
+
+### Create a new record of availability ###
+POST http://localhost:3001/api/availability/create/5/2/1
+
+### Update the criteria of availability from a volunteer ###
+PUT http://localhost:3001/api/availability/volunteermodify/2/0
+
+### Update the criteria of availability from administrator ###
+PUT http://localhost:3001/api/availability/adminmodify/2/3
