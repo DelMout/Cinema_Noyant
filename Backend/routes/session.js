@@ -11,5 +11,6 @@ router.get("/getallsessions", sessionCtrl.getAllSessions); //! Rmettre admin
 
 //* Delete a session
 router.delete("/delete/:sessionid", sessionCtrl.delete); //! Admin
+//! Revoir avec date antérieur à la date du jour
 
 module.exports = router;

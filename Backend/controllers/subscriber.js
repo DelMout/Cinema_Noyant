@@ -53,7 +53,7 @@ exports.sendEmail = (req, res) => {
 						subject: "[Cinéma Noyant] " + req.body.title,
 						html:
 							req.body.content +
-							"<br/><br/><p>Merci de ne pas répondre à cet email</p><p>L'équipe Cinéma Noyant</p>",
+							"<br/><br/><p>Merci de ne pas répondre à cet email</p><p>L'équipe Cinéma Noyant<br/>Familles Rurales</p>",
 					},
 					(error, info) => {
 						if (error) {

@@ -10,7 +10,15 @@ module.exports = (sequelize, DataTypes) => {
 					notEmpty: true,
 				},
 			},
-			time: {
+			time_perma: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				require,
+				validate: {
+					notEmpty: true,
+				},
+			},
+			time_seance: {
 				type: DataTypes.STRING,
 				allowNull: false,
 				require,

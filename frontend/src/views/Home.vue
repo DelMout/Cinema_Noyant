@@ -4,17 +4,22 @@
 		<div id="login">
 			<div>
 				<p class="p-float-label">
-					<InputText class="fill" id="email" type="text" v-model="email" />
+					<InputText class="" id="email" type="text" v-model="email" />
 					<label for="email">Email</label>
 				</p>
 				<p class="p-float-label password">
-					<InputText class="fill" id="password" type="text" v-model="password" />
+					<InputText class="" id="password" type="text" v-model="password" />
 					<label for="password">Mot de passe</label>
 				</p>
 			</div>
 			<div>
 				<Button label="Je me connecte" class="connect" @click="toConnect" />
 			</div>
+		</div>
+		<div id="delphine">
+			<a href="https://delmout.com" target="_blank"
+				><i>&#xA9; Site créé par Delphine Moutault</i></a
+			>
 		</div>
 	</div>
 </template>
@@ -93,5 +98,15 @@ h1 {
 .connect {
 	font-size: 1.2rem;
 	font-weight: bold;
+}
+#delphine {
+	position: absolute;
+	bottom: 1rem;
+	right: 1rem;
+	font-weight: bold;
+}
+#delphine a {
+	color: white;
+	text-decoration: none;
 }
 </style>

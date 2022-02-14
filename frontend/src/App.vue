@@ -1,7 +1,15 @@
 <template>
 	<div id="nav">
-		<router-link to="/">Home</router-link> | <router-link to="/abonnes">Abonnés</router-link> |
-		<router-link to="/about">About</router-link>
+		<div id="volun">
+			<router-link to="/">Home</router-link>
+			<router-link to="/permanences">Permanences</router-link>
+		</div>
+		<div id="admin">
+			<router-link to="/abonnes">Abonnés</router-link>
+			<router-link to="/email_abonnes">Email Abonnés</router-link>
+			<router-link to="/selection_seances">Séances</router-link>
+			<router-link to="/email_benevoles">Email Bénévoles</router-link>
+		</div>
 	</div>
 	<div id="router"><router-view /></div>
 </template>
@@ -22,6 +30,8 @@
 	top: 0;
 	/* background-color: yellow; */
 	width: 100%;
+	display: flex;
+	justify-content: center;
 }
 #router {
 	z-index: 10;
@@ -32,7 +42,17 @@
 	color: white;
 }
 
-#nav a.router-link-exact-active {
+#admin a.router-link-exact-active {
 	color: #42b983;
+}
+#volun a {
+	color: rgb(158, 158, 20);
+}
+#volun a.router-link-exact-active {
+	color: yellow;
+}
+a {
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
 }
 </style>

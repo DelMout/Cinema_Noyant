@@ -42,6 +42,14 @@
 				</tr>
 			</table>
 		</div>
+		<div>
+			<Dialog header="Confirmation" v-model:visible="dialog" :style="{ width: '15vw' }"
+				><p>Nouvel abonné créé !</p>
+				<template #footer>
+					<Button label="OK" @click="closeCreated" autofocus />
+				</template>
+			</Dialog>
+		</div>
 	</div>
 </template>
 <script>
@@ -54,6 +62,7 @@ export default {
 			last_name: "",
 			first_name: "",
 			email: "",
+			dialog: false,
 		};
 	},
 	beforeCreate: function () {
@@ -105,11 +114,15 @@ export default {
 				// headers: {
 				// 	Authorization: `Bearer ${this.token}`,
 				// },
-			}).then((sub) => {
-				console.log(sub);
-				//! Rafraichir la page, appeler la fonction qui affiche les abonnés
-				//! Affiche boit dialog et rafraichir la page
+			}).then(() => {
+				this.dialog = true;
 			});
+		},
+
+		//* Close dialog box
+		closeCreated: function () {
+			this.dialog = false;
+			location.reload();
 		},
 	},
 };

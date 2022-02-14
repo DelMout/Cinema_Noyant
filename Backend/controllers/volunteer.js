@@ -172,7 +172,7 @@ exports.emailInfo = (req, res) => {
 		},
 	});
 
-	//! Mettre lien vers le planning des dispo ?
+	//! Mettre lien en https du site
 	// List of volunteers
 	volunteer
 		.findAndCountAll()
@@ -187,7 +187,7 @@ exports.emailInfo = (req, res) => {
 						subject: "[Cinéma Noyant] " + req.body.title,
 						html:
 							req.body.content +
-							"<br/><br/><p>Merci de ne pas répondre à cet email</p><p>Administrateur de l'équipe Cinéma Noyant</p>",
+							"<br/><a href='http://localhost:8080/'>Voir les permanences des bénévoles</a><br/><br/><p>Merci de ne pas répondre à cet email</p><p>L'administration de l'équipe Cinéma de Noyant</p>",
 					},
 					(error, info) => {
 						if (error) {
