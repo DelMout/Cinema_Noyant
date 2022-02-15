@@ -114,5 +114,6 @@ h1 {
 }
 a {
 	color: blue;
+	margin-left: 0;
 }
 </style>

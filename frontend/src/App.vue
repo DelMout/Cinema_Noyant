@@ -43,7 +43,7 @@
 }
 
 #admin a.router-link-exact-active {
-	color: #42b983;
+	color: greenyellow;
 }
 #volun a {
 	color: rgb(158, 158, 20);
