@@ -12,4 +12,7 @@ router.put("/volunteermodify/:availabilityid/:available", availabilityCtrl.updat
 // * Modify the record of availability from administrator
 router.put("/adminmodify/:availabilityid/:available", availabilityCtrl.confirmAvailable); //! Rmettre admin
 
+// * Get availability from volunteer according to volunteerId and sessionId
+router.get("/getavailable/:volunteerid/:sessionid", availabilityCtrl.seeAvailable); //! Rmettre auth
+
 module.exports = router;

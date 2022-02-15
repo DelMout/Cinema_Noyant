@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<h1>Sélectionner les séances</h1>
+		<p>Nombre de séances maxi autorisé = 4</p>
 		<div id="date">
 			<p class="p-float-label">
 				<Calendar id="dateformat" v-model="date" dateFormat="dd/mm/yy" />

@@ -1,4 +1,5 @@
 const { availability } = require("../models");
+const { Op } = require("sequelize");
 
 // * Create a new record of availability
 exports.createAvailable = (req, res) => {
@@ -48,5 +49,24 @@ exports.confirmAvailable = (req, res) => {
 		})
 		.catch((err) => {
 			res.status(401).send(err);
+		});
+};
+
+//* Get the availability according volunteerId and sessionId
+exports.seeAvailable = (req, res) => {
+	availability
+		.findOne({
+			where: {
+				[Op.and]: [
+					{ volunteerId: req.params.volunteerid },
+					{ sessionId: req.params.sessionid },
+				],
+			},
+		})
+		.then((obj) => {
+			res.status(200).json(obj.available);
+		})
+		.catch((err) => {
+			res.status(200).send("null");
 		});
 };

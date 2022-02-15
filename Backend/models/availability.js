@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
 		"availability",
 		{
 			available: {
-				type: DataTypes.TINYINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 			},
 		},

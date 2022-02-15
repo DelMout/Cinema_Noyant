@@ -90,3 +90,6 @@ PUT http://localhost:3001/api/availability/volunteermodify/2/0
 
 ### Update the criteria of availability from administrator ###
 PUT http://localhost:3001/api/availability/adminmodify/2/3
+
+### see availability according to volunteerId and sessionId ###
+GET http://localhost:3001/api/availability/getavailable/3/2 
