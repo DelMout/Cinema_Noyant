@@ -6,7 +6,7 @@ exports.createAvailable = (req, res) => {
 	const newAvailable = new availability({
 		volunteerId: req.params.volunteerid,
 		sessionId: req.params.sessionid,
-		available: req.params.available,
+		available: "dispo",
 	});
 	newAvailable
 		.save()
@@ -64,7 +64,8 @@ exports.seeAvailable = (req, res) => {
 			},
 		})
 		.then((obj) => {
-			res.status(200).json(obj.available);
+			res.status(200).send(obj);
+			// res.status(200).json(obj.available);
 		})
 		.catch((err) => {
 			res.status(200).send("null");

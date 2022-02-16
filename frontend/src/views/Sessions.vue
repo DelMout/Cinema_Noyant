@@ -2,6 +2,7 @@
 	<div>
 		<h1>Sélectionner les séances</h1>
 		<p>Nombre de séances maxi autorisé = 4</p>
+		<p>Séances à créer dans l'ordre chronologique.</p>
 		<div id="date">
 			<p class="p-float-label">
 				<Calendar id="dateformat" v-model="date" dateFormat="dd/mm/yy" />
