@@ -93,3 +93,6 @@ PUT http://localhost:3001/api/availability/adminmodify/2/3
 
 ### see availability according to volunteerId and sessionId ###
 GET http://localhost:3001/api/availability/getavailable/3/3 
+
+### see total of volunteers by session for Technique et for Accueil ###
+GET http://localhost:3001/api/availability/gettotalvolunteers/1/Accueil 

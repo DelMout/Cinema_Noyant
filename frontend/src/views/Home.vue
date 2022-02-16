@@ -47,6 +47,7 @@ export default {
 				})
 				.then(() => {
 					console.log("you are connected !");
+					localStorage.clear(); // ! A mettre dans beforeMount si non connecté ensuite
 				})
 				.catch((err) => {
 					console.log(err);

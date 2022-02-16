@@ -1,7 +1,7 @@
 <template>
 	<div id="nav">
 		<div id="volun">
-			<router-link to="/">Home</router-link>
+			<router-link to="/">Accueil</router-link>
 			<router-link to="/permanences">Permanences</router-link>
 		</div>
 		<div id="admin">

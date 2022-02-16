@@ -15,4 +15,7 @@ router.put("/adminmodify/:availabilityid/:available", availabilityCtrl.confirmAv
 // * Get availability from volunteer according to volunteerId and sessionId
 router.get("/getavailable/:volunteerid/:sessionid", availabilityCtrl.seeAvailable); //! Rmettre auth
 
+// * Get total of volunteers by session for Technique et for Accueil
+router.get("/gettotalvolunteers/:sessionid/:available", availabilityCtrl.seeTotalVolunteers); //! Rmettre auth
+
 module.exports = router;

@@ -5,11 +5,35 @@
 			Légende : Dispo, Pas dispo, Présense requise dans l'équipe Technique, dans l'équipe
 			Accueil
 		</p>
+		<p>
+			Cliquer sur la case au croisement de votre nom et de la permanence voulue. Faites autant
+			de clics nécessaires pour faire apparaitre le status souhaité.
+		</p>
 		<div>
 			<table>
 				<tr>
-					<th id="black"></th>
-					<th>
+					<th class="black"></th>
+					<th class="black">
+						<p>
+							Accueil : 5<br />
+							Technique : 2
+						</p>
+					</th>
+					<th>1</th>
+					<th>1</th>
+				</tr>
+				<tr>
+					<th class="black">
+						<Button
+							v-if="volunId == admin_id"
+							:label="statusAdmin"
+							:id="statusAdmBack"
+							class="p-button-secondary"
+							@click="adminProfil"
+						/>
+						<p v-if="volunId == admin_id">{{ profil }}</p>
+					</th>
+					<th v-if="qty_sessions > 0">
 						<p>
 							{{ dateFr(sessions[0].date) }}
 						</p>
@@ -18,7 +42,7 @@
 							<span>{{ sessions[0].time_seance }}</span> Séance
 						</p>
 					</th>
-					<th>
+					<th v-if="qty_sessions > 1">
 						<p>
 							{{ dateFr(sessions[1].date) }}
 						</p>
@@ -27,13 +51,22 @@
 							<span>{{ sessions[1].time_seance }}</span> Séance
 						</p>
 					</th>
-					<th>
+					<th v-if="qty_sessions > 2">
 						<p>
 							{{ dateFr(sessions[2].date) }}
 						</p>
 						<p class="times">
 							<span>{{ sessions[2].time_perma }}</span> Permanence<br />
 							<span>{{ sessions[2].time_seance }}</span> Séance
+						</p>
+					</th>
+					<th v-if="qty_sessions > 3">
+						<p>
+							{{ dateFr(sessions[3].date) }}
+						</p>
+						<p class="times">
+							<span>{{ sessions[3].time_perma }}</span> Permanence<br />
+							<span>{{ sessions[3].time_seance }}</span> Séance
 						</p>
 					</th>
 				</tr>
@@ -53,7 +86,7 @@
 							:label="perm.sess_de.avail"
 							:id="perm.sess_de.avail"
 							class="grey p-button-secondary"
-							@click="selectAvailable"
+							@click="selectAvailable($event, perm, sessions[1].id, 2)"
 						/>
 					</td>
 					<td v-if="qty_sessions > 2">
@@ -61,7 +94,7 @@
 							:label="perm.sess_tr.avail"
 							:id="perm.sess_tr.avail"
 							class="grey p-button-secondary"
-							@click="selectAvailable"
+							@click="selectAvailable($event, perm, sessions[2].id, 3)"
 						/>
 					</td>
 					<td v-if="qty_sessions > 3">
@@ -69,7 +102,7 @@
 							:label="perm.sess_qu.avail"
 							:id="perm.sess_qu.avail"
 							class="grey p-button-secondary"
-							@click="selectAvailable"
+							@click="selectAvailable($event, perm, sessions[3].id, 4)"
 						/>
 					</td>
 				</tr>
@@ -94,15 +127,39 @@ export default {
 			value_avail: [
 				{ avail_id: "nothing", avail: "nothing" },
 				{ avail_id: "perm.sess_un.avail_id", avail: "perm.sess_un.avail" },
+				{ avail_id: "perm.sess_de.avail_id", avail: "perm.sess_de.avail" },
+				{ avail_id: "perm.sess_tr.avail_id", avail: "perm.sess_tr.avail" },
+				{ avail_id: "perm.sess_qu.avail_id", avail: "perm.sess_qu.avail" },
 			],
 			newavailable: "",
-			volunId: 3, //! A mettre dans Vuex lors d ela connexion
+			volunId: 13, //! A mettre dans Vuex lors d ela connexion
+			admin_change: false, //to modify status of others
+			statusAdmin: "Prendre profil Administrateur",
+			statusAdmBack: "yellow",
+			admin_id: process.env.VUE_APP_ADMIN,
+			profil: "Profil Bénévole = OK",
+			totalVolunteers: [],
 		};
 	},
 	created: function () {
 		//* Display all volunteers, Sessions and Permanences
 		this.getSessions();
 		this.getPermanences();
+		// this.getTotalVolunteers();
+	},
+	beforeMount: function () {
+		// See profil in localStorage
+		if (localStorage.getItem("profil") == "Admin") {
+			this.statusAdmin = "Prendre profil Bénévole";
+			this.statusAdmBack = "orange";
+			this.profil = "Profil Admin = OK";
+			this.admin_change = true; //to modify status of others
+		} else {
+			this.statusAdmin = "Prendre profil Administrateur";
+			this.statusAdmBack = "yellow";
+			this.profil = "Profil Bénévole = OK";
+			this.admin_change = false;
+		}
 	},
 
 	methods: {
@@ -129,21 +186,7 @@ export default {
 						time_perma: sess.data[s].time_perma,
 						time_seance: sess.data[s].time_seance,
 					});
-					// sort alpha order
-					// this.sessions.sort(function (a, b) {
-					// 	var dateA = a.date;
-					// 	var dateB = b.date;
-
-					// 	if (dateA < dateB) {
-					// 		return -1;
-					// 	}
-					// 	if (dateA > dateB) {
-					// 		return 1;
-					// 	}
-					// 	return 0;
-					// });
 				}
-				// console.log(this.sessions);
 			});
 		},
 
@@ -235,7 +278,7 @@ export default {
 											// },
 										}).then((availqu) => {
 											this.permanences.push({
-												id: vol.data[v].id,
+												volun_id: vol.data[v].id,
 												name:
 													vol.data[v].first_name +
 													" " +
@@ -283,13 +326,14 @@ export default {
 				}
 			});
 			console.log(this.permanences);
+			console.log(this.sessions);
 		},
 
 		//* Change the status of avail from a volunteer
 		changeStatus: function (availid, availnow) {
 			if (availnow == "dispo") {
 				this.newavailable = "indispo";
-			} else {
+			} else if (availnow == "indispo") {
 				this.newavailable = "dispo";
 			}
 			axios({
@@ -319,14 +363,42 @@ export default {
 			})
 				.then(() => {
 					console.log("youpi");
-					// location.reload();
+					location.reload();
 				})
 				.catch((err) => console.log(err));
 		},
 
-		//* Change status of permamence
+		//* Change the status of avail from the administrator
+		adminStatus: function (availid, availnow) {
+			if (availnow == "dispo") {
+				this.newavailable = "Accueil";
+			} else if (availnow == "Accueil") {
+				this.newavailable = "Technique";
+			} else if (availnow == "Technique") {
+				this.newavailable = "dispo";
+			} else {
+				console.log("la personne dopit avoir un status 'dispo' pour être confirmé !");
+			}
+			axios({
+				method: "put",
+				url:
+					process.env.VUE_APP_API +
+					"availability/volunteermodify/" +
+					availid +
+					"/" +
+					this.newavailable,
+				// headers: {
+				// 	Authorization: `Bearer ${this.token}`,
+				// },
+			}).then(() => {
+				location.reload();
+			});
+		},
+
+		//* Click on status of permamence
 		selectAvailable: function (event, perm, sessionid, sessorder) {
-			//! Si volunteerId est diff de vuex : mess err. Tu modifies seulement tes disponibilités...
+			//! Si volun_Id est diff de vuex : mess err. Tu modifies seulement tes disponibilités...
+			console.log(process.env.VUE_APP_ADMIN);
 			var avail_id = eval(this.value_avail[sessorder].avail_id);
 			var avail = eval(this.value_avail[sessorder].avail);
 			console.log("co = " + this.value_avail[1].avail_id);
@@ -338,8 +410,56 @@ export default {
 				//! volunteerId = volunteerId de Vuex
 				console.log("il faut créer une nouvelle entrée dans la table availabilitues");
 			} else {
-				this.changeStatus(avail_id, avail);
+				if (this.volunId == process.env.VUE_APP_ADMIN && this.admin_change === true) {
+					//! volunId de Vueex
+					this.adminStatus(avail_id, avail);
+					console.log("l'admin va changer le status !");
+				} else {
+					this.changeStatus(avail_id, avail);
+				}
 				console.log("modifier la donnée 'available' dans la table");
+			}
+		},
+
+		//* Choose Admin profil or volunteer profil (from the administrator)
+		adminProfil: function () {
+			if (this.statusAdmin == "Prendre profil Administrateur") {
+				this.statusAdmin = "Prendre profil Bénévole";
+				this.statusAdmBack = "orange";
+				this.profil = "Profil Admin = OK";
+				this.admin_change = true; //to modify status of others
+				localStorage.setItem("profil", "Admin");
+			} else {
+				this.statusAdmin = "Prendre profil Administrateur";
+				this.statusAdmBack = "yellow";
+				this.profil = "Profil Bénévole = OK";
+				this.admin_change = false; //to modify status of others
+				localStorage.setItem("profil", "Bénévole");
+			}
+		},
+
+		//* Get total of volunteers who do Technique and Accueil by session
+		getTotalVolunteers: function () {
+			this.totalVolunteers = [];
+
+			//! rechercher les sessions avec get, puis ordre croissant du tabl sur les id session
+			for (let s = 0; s < 4; s++) {
+				axios({
+					method: "get",
+					url:
+						process.env.VUE_APP_API +
+						"availability/gettotalvolunteers/" +
+						this.sessions[s].id +
+						"/Technique",
+					// headers: {
+					// 	Authorization: `Bearer ${this.token}`,
+					// },
+				}).then((countTech) => {
+					this.totalVolunteers[s] = [
+						{ sessionid: this.sessions[s].id, Technique: countTech },
+					];
+					console.log(this.totalVolunteers);
+				});
 			}
 		},
 	},
@@ -365,7 +485,7 @@ th {
 	height: 2.5rem;
 	background-color: rgb(68, 67, 67);
 }
-#black {
+.black {
 	background-color: black;
 }
 td {
@@ -402,5 +522,19 @@ td {
 }
 #name {
 	padding-left: 1rem;
+}
+#yellow {
+	background-color: yellow;
+	color: black;
+	font-weight: bold;
+	width: 60%;
+	height: 5rem;
+}
+#orange {
+	background-color: orangered;
+	color: black;
+	font-weight: bold;
+	width: 60%;
+	height: 5rem;
 }
 </style>

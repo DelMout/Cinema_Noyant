@@ -71,3 +71,23 @@ exports.seeAvailable = (req, res) => {
 			res.status(200).send("null");
 		});
 };
+
+// * Get total of volunteers by session for Technique et for Accueil
+exports.seeTotalVolunteers = (req, res) => {
+	availability
+		.findAndCountAll({
+			where: {
+				[Op.and]: [
+					{ sessionId: req.params.sessionid },
+					{ available: req.params.available },
+				],
+			},
+		})
+		.then((obj) => {
+			// res.status(200).send(obj);
+			res.status(200).json(obj.count);
+		})
+		.catch((err) => {
+			res.status(200).send(err);
+		});
+};
