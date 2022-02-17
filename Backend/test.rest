@@ -96,3 +96,6 @@ GET http://localhost:3001/api/availability/getavailable/3/3
 
 ### see total of volunteers by session for Technique et for Accueil ###
 GET http://localhost:3001/api/availability/gettotalvolunteers/1/Accueil 
+
+### Delete sessions if past dates ###
+DELETE http://localhost:3001/api/session/deletepastdates 

@@ -13,6 +13,12 @@
 				</p>
 			</div>
 			<div>
+				<Button
+					label="Mot de passe oublié"
+					class="forgot p-button-text p-button-secondary"
+					id="forgot"
+					@click="forgotten"
+				/>
 				<Button label="Je me connecte" class="connect" @click="toConnect" />
 			</div>
 		</div>
@@ -36,7 +42,9 @@ export default {
 			password: "",
 		};
 	},
-	components: {},
+	created: function () {
+		this.deletePastSessions();
+	},
 	methods: {
 		//* To Connect
 		toConnect: function () {
@@ -52,6 +60,17 @@ export default {
 				.catch((err) => {
 					console.log(err);
 				});
+		},
+
+		//* Password forgotten
+		forgotten: function () {},
+
+		//* Delete sessions if past dates
+		deletePastSessions: function () {
+			axios
+				.delete(process.env.VUE_APP_API + "session/deletepastdates ")
+				.then(() => {})
+				.catch(() => {});
 		},
 	},
 };
@@ -88,7 +107,7 @@ h1 {
 }
 #login div:nth-child(2) {
 	margin: 0;
-	margin-top: auto;
+	margin-top: 0;
 	margin-left: 8rem;
 }
 
@@ -96,10 +115,19 @@ h1 {
 	margin-top: 2.5rem;
 	margin-bottom: 0;
 }
+.forgot {
+	text-decoration: underline;
+	margin-top: 1rem;
+}
+#forgot {
+	color: black;
+}
 .connect {
 	font-size: 1.2rem;
 	font-weight: bold;
+	margin-top: 3.5rem;
 }
+
 #delphine {
 	position: absolute;
 	bottom: 1rem;

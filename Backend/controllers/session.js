@@ -1,4 +1,5 @@
 const { session } = require("../models");
+const moment = require("moment");
 
 //* Create a new session
 exports.createSession = (req, res) => {
@@ -32,4 +33,25 @@ exports.delete = (req, res) => {
 		.catch((err) => {
 			res.send(err);
 		});
+};
+
+//* Delete sessions if past dates
+exports.deletePastDates = (req, res) => {
+	//get all sessions
+	session.findAll({}).then((sessions) => {
+		const today = moment(new Date()).format("YYYY-MM-DD");
+		// res.send(today);
+		for (let s = 0; s < sessions.length; s++) {
+			if (today > sessions[s].date) {
+				session
+					.destroy({ where: { id: sessions[s].id } })
+					.then(() => {
+						res.send("session deleted");
+					})
+					.catch((err) => {
+						res.send(err);
+					});
+			}
+		}
+	});
 };

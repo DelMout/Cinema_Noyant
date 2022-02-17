@@ -7,7 +7,6 @@ const path = require("path");
 const helmet = require("helmet"); // Protect HTTP headers
 
 // const userRoutes = require("./routes/user");
-const productRoutes = require("./routes/product");
 const subscriberRoutes = require("./routes/subscriber");
 const volunteerRoutes = require("./routes/volunteer");
 const sessionRoutes = require("./routes/session");
@@ -19,7 +18,6 @@ const availabilityRoutes = require("./routes/availability");
 
 // Models
 // const { user } = require("./models");
-const { product } = require("./models");
 const { subscriber } = require("./models");
 const { volunteer } = require("./models");
 const { session } = require("./models");
@@ -54,9 +52,6 @@ app.use(helmet());
 //  * User
 // app.use("/api/user", userRoutes);
 
-// * Product
-app.use("/api/product", productRoutes);
-
 // * Subscriber
 app.use("/api/subscriber", subscriberRoutes);
 
@@ -85,30 +80,3 @@ app.use("/api/availability", availabilityRoutes);
 app.use("/images/", express.static(path.join(__dirname, "images")));
 
 module.exports = app;
-
-// require("dotenv").config();
-
-// const express = require("express");
-// const cors = require("cors");
-// const bodyParser = require("body-parser");
-// const helmet = require("helmet"); // Protect HTTP headers
-// const app = express();
-
-// // Routes
-// const productRoutes = require("./routes/product");
-
-// // Models
-// const { product } = require("./models");
-
-// //* **** API routes ****
-// //  * User
-// app.use("/api/product", productRoutes);
-
-// app.use(cors()); // Security CORS
-// app.use(express.json());
-
-// app.use(express.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
-// app.use(helmet());
-
-// module.exports = app;

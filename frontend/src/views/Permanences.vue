@@ -13,14 +13,30 @@
 			<table>
 				<tr>
 					<th class="black"></th>
-					<th class="black">
+					<th v-if="qty_sessions > 0" class="black total">
 						<p>
-							Accueil : 5<br />
-							Technique : 2
+							Accueil : {{ totalVolunteers[0].count.Accueil }}<br />
+							Technique : {{ totalVolunteers[0].count.Technique }}
 						</p>
 					</th>
-					<th>1</th>
-					<th>1</th>
+					<th v-if="qty_sessions > 1" class="black total">
+						<p>
+							Accueil : {{ totalVolunteers[1].count.Accueil }}<br />
+							Technique : {{ totalVolunteers[1].count.Technique }}
+						</p>
+					</th>
+					<th v-if="qty_sessions > 2" class="black total">
+						<p>
+							Accueil : {{ totalVolunteers[2].count.Accueil }}<br />
+							Technique : {{ totalVolunteers[2].count.Technique }}
+						</p>
+					</th>
+					<th v-if="qty_sessions > 3" class="black total">
+						<p>
+							Accueil : {{ totalVolunteers[3].count.Accueil }}<br />
+							Technique : {{ totalVolunteers[3].count.Technique }}
+						</p>
+					</th>
 				</tr>
 				<tr>
 					<th class="black">
@@ -126,13 +142,29 @@ export default {
 			fourth_session: 0,
 			value_avail: [
 				{ avail_id: "nothing", avail: "nothing" },
-				{ avail_id: "perm.sess_un.avail_id", avail: "perm.sess_un.avail" },
-				{ avail_id: "perm.sess_de.avail_id", avail: "perm.sess_de.avail" },
-				{ avail_id: "perm.sess_tr.avail_id", avail: "perm.sess_tr.avail" },
-				{ avail_id: "perm.sess_qu.avail_id", avail: "perm.sess_qu.avail" },
+				{
+					avail_id: "perm.sess_un.avail_id",
+					avail: "perm.sess_un.avail",
+					count: "countun",
+				},
+				{
+					avail_id: "perm.sess_de.avail_id",
+					avail: "perm.sess_de.avail",
+					count: "countde",
+				},
+				{
+					avail_id: "perm.sess_tr.avail_id",
+					avail: "perm.sess_tr.avail",
+					count: "counttr",
+				},
+				{
+					avail_id: "perm.sess_qu.avail_id",
+					avail: "perm.sess_qu.avail",
+					count: "countqu",
+				},
 			],
 			newavailable: "",
-			volunId: 13, //! A mettre dans Vuex lors d ela connexion
+			volunId: 3, //! A mettre dans Vuex lors d ela connexion
 			admin_change: false, //to modify status of others
 			statusAdmin: "Prendre profil Administrateur",
 			statusAdmBack: "yellow",
@@ -145,7 +177,7 @@ export default {
 		//* Display all volunteers, Sessions and Permanences
 		this.getSessions();
 		this.getPermanences();
-		// this.getTotalVolunteers();
+		this.getTotalVolunteers();
 	},
 	beforeMount: function () {
 		// See profil in localStorage
@@ -443,24 +475,59 @@ export default {
 			this.totalVolunteers = [];
 
 			//! rechercher les sessions avec get, puis ordre croissant du tabl sur les id session
-			for (let s = 0; s < 4; s++) {
-				axios({
-					method: "get",
-					url:
-						process.env.VUE_APP_API +
-						"availability/gettotalvolunteers/" +
-						this.sessions[s].id +
-						"/Technique",
-					// headers: {
-					// 	Authorization: `Bearer ${this.token}`,
-					// },
-				}).then((countTech) => {
-					this.totalVolunteers[s] = [
-						{ sessionid: this.sessions[s].id, Technique: countTech },
-					];
-					console.log(this.totalVolunteers);
-				});
-			}
+			// get all sessions
+			axios({
+				method: "get",
+				url: process.env.VUE_APP_API + "session/getallsessions ",
+				// headers: {
+				// 	Authorization: `Bearer ${this.token}`,
+				// },
+			}).then((sess) => {
+				for (let s = 0; s < sess.data.length; s++) {
+					axios({
+						method: "get",
+						url:
+							process.env.VUE_APP_API +
+							"availability/gettotalvolunteers/" +
+							sess.data[s].id +
+							"/Technique",
+						// headers: {
+						// 	Authorization: `Bearer ${this.token}`,
+						// },
+					}).then((countTech) => {
+						axios({
+							method: "get",
+							url:
+								process.env.VUE_APP_API +
+								"availability/gettotalvolunteers/" +
+								sess.data[s].id +
+								"/Accueil",
+							// headers: {
+							// 	Authorization: `Bearer ${this.token}`,
+							// },
+						}).then((countAcc) => {
+							this.totalVolunteers.push({
+								sessionid: sess.data[s].id,
+								count: { Technique: countTech.data, Accueil: countAcc.data },
+							});
+							// sort alpha order
+							this.totalVolunteers.sort(function (a, b) {
+								var idA = a.sessionid;
+								var idB = b.sessionid;
+
+								if (idA < idB) {
+									return -1;
+								}
+								if (idA > idB) {
+									return 1;
+								}
+								return 0;
+							});
+						});
+					});
+				}
+				console.log(this.totalVolunteers);
+			});
 		},
 	},
 };
@@ -487,6 +554,10 @@ th {
 }
 .black {
 	background-color: black;
+}
+.total {
+	text-align: left;
+	padding-left: 4rem;
 }
 td {
 	text-align: left;
@@ -522,6 +593,8 @@ td {
 }
 #name {
 	padding-left: 1rem;
+	background-color: rgb(68, 67, 67);
+	font-weight: bold;
 }
 #yellow {
 	background-color: yellow;
