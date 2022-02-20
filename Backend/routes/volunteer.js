@@ -15,6 +15,12 @@ router.post("/login", volunteerCtrl.login);
 // * Modify password after lost
 router.put("/password/:jeton", volunteerCtrl.updatePassword);
 
+// * Update jeton (used for forgotten password)
+router.put("/newjeton/:email", volunteerCtrl.newjeton); //! auth
+
+//* Find volunteer from his jeton
+router.get("/fromjeton/:jeton", volunteerCtrl.jeton);
+
 // * send email for updating password
 router.post("/emailpassword/:email", volunteerCtrl.emailPassword);
 

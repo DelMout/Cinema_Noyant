@@ -1,9 +1,13 @@
 <template>
 	<div>
-		<h1>Sélectionner les séances</h1>
-		<p>Nombre de séances maxi autorisé = 4</p>
-		<p>Séances à créer dans l'ordre chronologique.</p>
-		<p>Les séances dans le passé disparaissent automatiquement.</p>
+		<h1>Créer les séances</h1>
+		<div>
+			<p>
+				Nombre de séances maxi autorisé = 4<br />
+				Séances à créer dans l'ordre chronologique.<br />
+				Les séances dans le passé disparaissent automatiquement.
+			</p>
+		</div>
 		<div id="date">
 			<table>
 				<tr>

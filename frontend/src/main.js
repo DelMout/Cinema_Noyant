@@ -10,6 +10,9 @@ import ProgressSpinner from "primevue/progressspinner";
 import Calendar from "primevue/calendar";
 import ConfirmPopup from "primevue/confirmpopup";
 import ConfirmationService from "primevue/confirmationservice";
+import ToastService from "primevue/toastservice";
+import Toast from "primevue/toast";
+import Password from "primevue/password";
 
 import "primevue/resources/themes/saga-orange/theme.css"; //theme
 import "primevue/resources/primevue.min.css"; //core css
@@ -25,5 +28,8 @@ createApp(App)
 	.component("ProgressSpinner", ProgressSpinner)
 	.component("Calendar", Calendar)
 	.component("ConfirmPopup", ConfirmPopup)
+	.component("Password", Password)
+	.use(ToastService)
+	.component("Toast", Toast)
 	.use(router)
 	.mount("#app");

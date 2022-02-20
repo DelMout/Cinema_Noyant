@@ -142,7 +142,7 @@ exports.emailPassword = (req, res) => {
 						nom +
 						",</p></br>" +
 						message +
-						"</br><a href='http://localhot:8080/setpassword/" +
+						"</br><a href='http://localhost:8080/setpassword/" +
 						jeton +
 						"'>Saisir un nouveau mot de passe</a></br></br><p>Merci de ne pas répondre à cet email.</p>",
 				},
@@ -155,6 +155,18 @@ exports.emailPassword = (req, res) => {
 			);
 		})
 		.catch((err) => res.status(401).send(err));
+};
+
+//* Find volunteer from his jeton
+exports.jeton = (req, res) => {
+	volunteer
+		.findOne({ where: { jeton: req.params.jeton } })
+		.then((obj) => {
+			res.status(200).send(obj);
+		})
+		.catch((err) => {
+			res.status(401).send(err);
+		});
 };
 
 // * Send an email to all users for specific information
@@ -199,4 +211,26 @@ exports.emailInfo = (req, res) => {
 			}
 		})
 		.catch((err) => res.status(401).send(err));
+};
+
+//* Update jeton (used for forgotten password)
+exports.newjeton = (req, res) => {
+	const characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	let jeton = "";
+	for (let i = 0; i < 25; i++) {
+		jeton += characters[Math.floor(Math.random() * characters.length)];
+	}
+	volunteer
+		.update(
+			{
+				jeton: jeton,
+			},
+			{ where: { email: req.params.email } }
+		)
+		.then(() => {
+			res.send("volunteer's jeton modified !");
+		})
+		.catch((err) => {
+			res.status(401).send(err);
+		});
 };

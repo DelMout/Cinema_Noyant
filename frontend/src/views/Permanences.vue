@@ -1,14 +1,30 @@
 <template>
-	<div>
+	<div id="permanences">
 		<h1>Permanences des Bénévoles</h1>
-		<p>
-			Légende : Dispo, Pas dispo, Présense requise dans l'équipe Technique, dans l'équipe
-			Accueil
-		</p>
-		<p>
+		<p class="instruction">
 			Cliquer sur la case au croisement de votre nom et de la permanence voulue. Faites autant
-			de clics nécessaires pour faire apparaitre le status souhaité.
+			de clics nécessaires pour faire apparaitre le statut souhaité.
 		</p>
+		<div id="legende">
+			<div>
+				<div>
+					<p>Légende :&nbsp;</p>
+				</div>
+				<div id="case_dispo"></div>
+				<span>&nbsp;Disponible,&nbsp;</span>
+				<div id="case_indispo"></div>
+				<span>&nbsp;Indisponible,&nbsp;</span>
+				<div id="case_tech"></div>
+				<span>&nbsp;Présence requise dans l'équipe Technique,&nbsp;</span>
+				<div id="case_accue"></div>
+				<span>&nbsp;Présence requise dans l'équipe Accueil.</span>
+			</div>
+		</div>
+		<p class="instruction">
+			Les 2 permiers statuts sont au choix du bénévole. Les 2 autres statuts sont décidés et
+			sélectionnés par l'administrateur.
+		</p>
+
 		<div>
 			<table>
 				<tr>
@@ -535,6 +551,11 @@ export default {
 <style scoped>
 h1 {
 	margin-top: 5rem;
+	margin-bottom: 2rem;
+}
+.instruction {
+	margin-bottom: 0;
+	margin-top: 0;
 }
 table {
 	margin: auto;
@@ -559,6 +580,9 @@ th {
 	text-align: left;
 	padding-left: 4rem;
 }
+.total > p {
+	margin-bottom: 0.5rem;
+}
 td {
 	text-align: left;
 	height: 2.5rem;
@@ -573,9 +597,11 @@ td {
 }
 #dispo {
 	background-color: green;
+	color: green;
 }
 #indispo {
 	background-color: red;
+	color: red;
 }
 #Accueil {
 	background-color: purple;
@@ -609,5 +635,33 @@ td {
 	font-weight: bold;
 	width: 60%;
 	height: 5rem;
+}
+#case_dispo {
+	width: 50px;
+	height: 20px;
+	background: green;
+}
+#case_indispo {
+	width: 50px;
+	height: 20px;
+	background: red;
+}
+#case_tech {
+	width: 50px;
+	height: 20px;
+	background: blue;
+}
+#case_accue {
+	width: 50px;
+	height: 20px;
+	background: purple;
+}
+#legende {
+	display: flex;
+}
+#legende > div {
+	margin: auto;
+	display: flex;
+	align-items: baseline;
 }
 </style>
