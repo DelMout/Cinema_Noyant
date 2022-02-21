@@ -22,43 +22,68 @@
 			</div>
 			<div id="load">
 				<div>
-					<span>&nbsp;Télécharger une image : </span
-					><input class="uploadFile" type="file" name="image" @change="onFileChange" />
+					<span>&nbsp;Télécharger une image :&nbsp;</span
+					><InputText
+						class="uploadFile"
+						type="file"
+						name="image"
+						@change="onFileChange"
+					/>
 					<Button
-						label="Save the file"
-						class="p-button-raised p-button-primary envoi"
+						label="Sauvegarder l'image"
+						class="p-button-raised p-button-info envoi savefile"
 						@click="saveFile"
 					/>
 				</div>
-				<div id="poster">
-					<div class="post_butt">
-						<img
-							src="http://localhost:3001/images/affiche_un.jpg"
-							alt="affiche cinéma"
-							crossorigin="anonymous"
-							width="250"
-							id="first"
-						/><Button
+				<div id="select_poster">
+					<div id="on_poster">
+						<p>Cliquer sur une affiche pour la joindre à l'email :</p>
+					</div>
+					<div id="poster">
+						<div class="post_butt">
+							<img
+								src="http://localhost:3001/images/affiche_un.jpg"
+								alt="affiche cinéma"
+								crossorigin="anonymous"
+								width="250"
+								height="340"
+								id="first"
+								@click="selectOne"
+							/>
+							<!-- <Button
 							v-if="filename != 'affiche_un.jpg'"
 							label="Sélectionner cette affiche"
 							class="p-button-raised p-button-info selec"
-							@click="selectOne"
-						/>
-					</div>
-					<div class="post_butt">
-						<img
-							src="http://localhost:3001/images/affiche_de.jpg"
-							alt="affiche cinéma"
-							crossorigin="anonymous"
-							width="250"
-							id="second"
-						/><Button
+							
+						/> -->
+						</div>
+						<div class="post_butt">
+							<img
+								src="http://localhost:3001/images/affiche_de.jpg"
+								alt="affiche cinéma"
+								crossorigin="anonymous"
+								width="250"
+								height="340"
+								id="second"
+								@click="selectTwo"
+							/>
+							<!-- <Button
 							v-if="filename != 'affiche_de.jpg'"
 							label="Sélectionner cette affiche"
 							class="p-button-raised p-button-info selec"
-							@click="selectTwo"
-						/>
+						/> -->
+						</div>
+						<div class="post_butt" @click="selectNo">
+							<div id="no_post"><p>Ne pas joindre d'affiche</p></div>
+						</div>
 					</div>
+					<!-- <div class="post_no">
+						<Button
+							label="Sans image jointe"
+							class="p-button-raised p-button-info selec"
+							@click="selectNo"
+						/>
+					</div> -->
 				</div>
 			</div>
 			<div id="pied">
@@ -89,6 +114,18 @@
 				</template>
 			</Dialog>
 		</div>
+		<div style="width: 30vw">
+			<Toast position="center" :breakpoints="{ '400px': { width: '95%' } }">
+				<template #message="slotProps">
+					<div class="p-d-flex p-flex-row">
+						<div class="p-text-center">
+							<i class="pi pi-exclamation-triangle" style="font-size: 2rem"></i>
+							<p>{{ slotProps.message.detail }}</p>
+						</div>
+					</div>
+				</template>
+			</Toast>
+		</div>
 	</div>
 </template>
 <script>
@@ -116,10 +153,17 @@ export default {
 		//* Send email to all subscribers
 		sendEmail: function () {
 			this.emailSent = true;
+			console.log(this.filename);
 			// const formData = new FormData();
 			// // formData.append("image", this.image);
 			// formData.append("title", this.object);
 			// formData.append("content", this.body);
+
+			if (this.filename == "") {
+				this.filename = "baladimages.jpg";
+				console.log("g compris le message !");
+				//! Pas d'affiche de sélectionnée, ok ?
+			}
 
 			axios({
 				method: "post",
@@ -128,16 +172,24 @@ export default {
 					title: this.object,
 					content: this.body,
 					filename: this.filename,
-					// affiche: this.image,
 				},
 				// data: formData,
 				// headers: {
 				// 	Authorization: `Bearer ${this.token}`,
 				// },
-			}).then(() => {
-				this.dialog = true;
-				this.emailSent = false;
-			});
+			})
+				.then(() => {
+					this.dialog = true;
+					this.emailSent = false;
+				})
+				.catch(() => {
+					this.$toast.add({
+						severity: "error",
+						detail: "Un problème est survenu. L'envoi de l'email n'a pas été effectué.",
+						closable: false,
+						life: 4000,
+					});
+				});
 		},
 
 		//* Close dialog box
@@ -177,6 +229,7 @@ export default {
 			})
 				.then((rep) => {
 					console.log(rep);
+					location.reload();
 				})
 				.catch((err) => {
 					console.log(err);
@@ -190,6 +243,8 @@ export default {
 			doc1.setAttribute("style", "border:10px solid yellow");
 			let doc2 = document.getElementById("second");
 			doc2.setAttribute("style", "none");
+			let doc3 = document.getElementById("no_post");
+			doc3.setAttribute("style", "none");
 		},
 		selectTwo: function () {
 			this.filename = "affiche_de.jpg";
@@ -197,6 +252,17 @@ export default {
 			doc1.setAttribute("style", "none");
 			let doc2 = document.getElementById("second");
 			doc2.setAttribute("style", "border:10px solid yellow");
+			let doc3 = document.getElementById("no_post");
+			doc3.setAttribute("style", "none");
+		},
+		selectNo: function () {
+			this.filename = "baladimages.jpg";
+			let doc1 = document.getElementById("first");
+			doc1.setAttribute("style", "none");
+			let doc2 = document.getElementById("second");
+			doc2.setAttribute("style", "none");
+			let doc3 = document.getElementById("no_post");
+			doc3.setAttribute("style", "border:10px solid yellow");
 		},
 	},
 };
@@ -228,8 +294,13 @@ h1 {
 	/* background-color: rgb(25, 99, 196); */
 	margin-top: 1rem;
 }
-#load > div:nth-child(1) {
+#load > div {
+	display: flex;
+}
+#load > div:nth-child(1) > span {
 	background-color: rgb(25, 99, 196);
+	padding-top: 0.8rem;
+	padding-bottom: 0.8rem;
 }
 .uploadFile {
 	/* display: inline-block;
@@ -241,14 +312,46 @@ h1 {
 }
 #poster {
 	display: flex;
-	margin-top: 2rem;
+	margin-left: 1rem;
+	margin-bottom: 1rem;
 }
 .post_butt {
 	display: flex;
 	flex-direction: column;
-	margin-right: 2rem;
+	margin-right: 1rem;
+	cursor: pointer;
 }
+
 .selec {
 	margin-top: 1rem;
+}
+.savefile {
+	height: 100%;
+	margin-left: 1rem;
+	border: 3px solid rgb(25, 99, 196);
+	background-color: rgb(214, 210, 210);
+	color: rgb(70, 68, 68);
+}
+#on_poster {
+	/* margin-bottom: 0.5rem; */
+	text-align: left;
+	margin-left: 1rem;
+}
+#no_post {
+	background-color: grey;
+	width: 250px;
+	height: 340px;
+	color: black;
+	font-weight: bold;
+	display: flex;
+}
+#no_post > p {
+	margin: auto;
+}
+#select_poster {
+	background-color: rgb(25, 99, 196);
+	margin-top: 2rem;
+	display: flex;
+	flex-direction: column;
 }
 </style>
