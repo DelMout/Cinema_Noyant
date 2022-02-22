@@ -152,44 +152,64 @@ export default {
 
 		//* Send email to all subscribers
 		sendEmail: function () {
-			this.emailSent = true;
 			console.log(this.filename);
 			// const formData = new FormData();
 			// // formData.append("image", this.image);
 			// formData.append("title", this.object);
 			// formData.append("content", this.body);
 
-			if (this.filename == "") {
-				this.filename = "baladimages.jpg";
-				console.log("g compris le message !");
-				//! Pas d'affiche de sélectionnée, ok ?
-			}
-
-			axios({
-				method: "post",
-				url: process.env.VUE_APP_API + "subscriber/sendemail",
-				data: {
-					title: this.object,
-					content: this.body,
-					filename: this.filename,
-				},
-				// data: formData,
-				// headers: {
-				// 	Authorization: `Bearer ${this.token}`,
-				// },
-			})
-				.then(() => {
-					this.dialog = true;
-					this.emailSent = false;
-				})
-				.catch(() => {
-					this.$toast.add({
-						severity: "error",
-						detail: "Un problème est survenu. L'envoi de l'email n'a pas été effectué.",
-						closable: false,
-						life: 4000,
-					});
+			// If no poster selected OR title OR contenu do not continue
+			if (this.object == "") {
+				this.$toast.add({
+					severity: "error",
+					detail: "Merci d'écrire un objet à votre email.",
+					closable: false,
+					life: 4000,
 				});
+			} else if (this.body == "") {
+				this.$toast.add({
+					severity: "error",
+					detail: "Merci d'écrire un contenu dans le corps de votre email.",
+					closable: false,
+					life: 4000,
+				});
+			} else if (this.filename == "") {
+				this.$toast.add({
+					severity: "error",
+					detail: "Merci de sélectionner un affiche.",
+					closable: false,
+					life: 4000,
+				});
+
+				console.log("g compris le message !");
+			} else {
+				this.emailSent = true;
+				axios({
+					method: "post",
+					url: process.env.VUE_APP_API + "subscriber/sendemail",
+					data: {
+						title: this.object,
+						content: this.body,
+						filename: this.filename,
+					},
+					// data: formData,
+					// headers: {
+					// 	Authorization: `Bearer ${this.token}`,
+					// },
+				})
+					.then(() => {
+						this.dialog = true;
+						this.emailSent = false;
+					})
+					.catch(() => {
+						this.$toast.add({
+							severity: "error",
+							detail: "Un problème est survenu. L'envoi de l'email n'a pas été effectué.",
+							closable: false,
+							life: 4000,
+						});
+					});
+			}
 		},
 
 		//* Close dialog box

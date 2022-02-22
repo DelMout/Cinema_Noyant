@@ -47,6 +47,18 @@
 				</template>
 			</Dialog>
 		</div>
+		<div style="width: 30vw">
+			<Toast position="center" :breakpoints="{ '400px': { width: '95%' } }">
+				<template #message="slotProps">
+					<div class="p-d-flex p-flex-row">
+						<div class="p-text-center">
+							<i class="pi pi-exclamation-triangle" style="font-size: 2rem"></i>
+							<p>{{ slotProps.message.detail }}</p>
+						</div>
+					</div>
+				</template>
+			</Toast>
+		</div>
 	</div>
 </template>
 <script>
@@ -64,21 +76,47 @@ export default {
 	methods: {
 		//* Send email to all volunteers
 		sendEmail: function () {
-			this.emailSent = true;
-			axios({
-				method: "post",
-				url: process.env.VUE_APP_API + "volunteer/emailinfo",
-				data: {
-					title: this.object,
-					content: this.body,
-				},
-				// headers: {
-				// 	Authorization: `Bearer ${this.token}`,
-				// },
-			}).then(() => {
-				this.dialog = true;
-				this.emailSent = false;
-			});
+			// If no poster selected OR title OR contenu do not continue
+			if (this.object == "") {
+				this.$toast.add({
+					severity: "error",
+					detail: "Merci d'écrire un objet à votre email.",
+					closable: false,
+					life: 4000,
+				});
+			} else if (this.body == "") {
+				this.$toast.add({
+					severity: "error",
+					detail: "Merci d'écrire un contenu dans le corps de votre email.",
+					closable: false,
+					life: 4000,
+				});
+			} else {
+				this.emailSent = true;
+				axios({
+					method: "post",
+					url: process.env.VUE_APP_API + "volunteer/emailinfo",
+					data: {
+						title: this.object,
+						content: this.body,
+					},
+					// headers: {
+					// 	Authorization: `Bearer ${this.token}`,
+					// },
+				})
+					.then(() => {
+						this.dialog = true;
+						this.emailSent = false;
+					})
+					.catch(() => {
+						this.$toast.add({
+							severity: "error",
+							detail: "Un problème est survenu. L'envoi de l'email n'a pas été effectué.",
+							closable: false,
+							life: 4000,
+						});
+					});
+			}
 		},
 
 		//* Close dialog box
