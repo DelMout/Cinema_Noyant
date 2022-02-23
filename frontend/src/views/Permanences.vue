@@ -57,13 +57,13 @@
 				<tr>
 					<th class="black">
 						<Button
-							v-if="volunId == admin_id"
+							v-if="admin === 1"
 							:label="statusAdmin"
 							:id="statusAdmBack"
 							class="p-button-secondary"
 							@click="adminProfil"
 						/>
-						<p v-if="volunId == admin_id">{{ profil }}</p>
+						<p v-if="admin === 1">{{ profil }}</p>
 					</th>
 					<th v-if="qty_sessions > 0">
 						<p>
@@ -145,6 +145,7 @@
 <script>
 import axios from "axios";
 import moment from "moment";
+import { mapState } from "vuex";
 
 export default {
 	data() {
@@ -180,14 +181,17 @@ export default {
 				},
 			],
 			newavailable: "",
-			volunId: 3, //! A mettre dans Vuex lors d ela connexion
+			// volunId: JSON.parse(localStorage.getItem("volunteerId")),
+			admin: JSON.parse(localStorage.getItem("isAdmin")),
 			admin_change: false, //to modify status of others
 			statusAdmin: "Prendre profil Administrateur",
 			statusAdmBack: "yellow",
-			admin_id: process.env.VUE_APP_ADMIN,
 			profil: "Profil Bénévole = OK",
 			totalVolunteers: [],
 		};
+	},
+	computed: {
+		...mapState(["volunteerId", "token"]),
 	},
 	created: function () {
 		//* Display all volunteers, Sessions and Permanences
@@ -223,9 +227,9 @@ export default {
 			axios({
 				method: "get",
 				url: process.env.VUE_APP_API + "session/getallsessions",
-				// headers: {
-				// 	Authorization: `Bearer ${this.token}`,
-				// },
+				headers: {
+					Authorization: `Bearer ${this.token}`,
+				},
 			}).then((sess) => {
 				for (let s = 0; s < sess.data.length; s++) {
 					this.sessions.push({
@@ -247,20 +251,19 @@ export default {
 			axios({
 				method: "get",
 				url: process.env.VUE_APP_API + "volunteer/getallvolunteers",
-				// headers: {
-				// 	Authorization: `Bearer ${this.token}`,
-				// },
+				headers: {
+					Authorization: `Bearer ${this.token}`,
+				},
 			}).then((vol) => {
-				// for (let v = 0; v < 1; v++) {
 				for (let v = 0; v < vol.data.length; v++) {
 					//!
 					// get all sessions
 					axios({
 						method: "get",
 						url: process.env.VUE_APP_API + "session/getallsessions ",
-						// headers: {
-						// 	Authorization: `Bearer ${this.token}`,
-						// },
+						headers: {
+							Authorization: `Bearer ${this.token}`,
+						},
 					}).then((sess) => {
 						this.qty_sessions = sess.data.length;
 						if (this.qty_sessions === 0) {
@@ -285,9 +288,9 @@ export default {
 									vol.data[v].id +
 									"/" +
 									sess.data[this.first_session].id,
-								// headers: {
-								// 	Authorization: `Bearer ${this.token}`,
-								// },
+								headers: {
+									Authorization: `Bearer ${this.token}`,
+								},
 							}).then((availun) => {
 								axios({
 									method: "get",
@@ -297,9 +300,9 @@ export default {
 										vol.data[v].id +
 										"/" +
 										sess.data[this.sec_session].id,
-									// headers: {
-									// 	Authorization: `Bearer ${this.token}`,
-									// },
+									headers: {
+										Authorization: `Bearer ${this.token}`,
+									},
 								}).then((availde) => {
 									axios({
 										method: "get",
@@ -309,9 +312,9 @@ export default {
 											vol.data[v].id +
 											"/" +
 											sess.data[this.third_session].id,
-										// headers: {
-										// 	Authorization: `Bearer ${this.token}`,
-										// },
+										headers: {
+											Authorization: `Bearer ${this.token}`,
+										},
 									}).then((availtr) => {
 										axios({
 											method: "get",
@@ -321,9 +324,9 @@ export default {
 												vol.data[v].id +
 												"/" +
 												sess.data[this.fourth_session].id,
-											// headers: {
-											// 	Authorization: `Bearer ${this.token}`,
-											// },
+											headers: {
+												Authorization: `Bearer ${this.token}`,
+											},
 										}).then((availqu) => {
 											this.permanences.push({
 												volun_id: vol.data[v].id,
@@ -392,9 +395,9 @@ export default {
 					availid +
 					"/" +
 					this.newavailable,
-				// headers: {
-				// 	Authorization: `Bearer ${this.token}`,
-				// },
+				headers: {
+					Authorization: `Bearer ${this.token}`,
+				},
 			}).then(() => {
 				location.reload();
 			});
@@ -405,9 +408,9 @@ export default {
 			axios({
 				method: "post",
 				url: process.env.VUE_APP_API + "availability/create/" + volunid + "/" + sessionid,
-				// headers: {
-				// 	Authorization: `Bearer ${this.token}`,
-				// },
+				headers: {
+					Authorization: `Bearer ${this.token}`,
+				},
 			})
 				.then(() => {
 					console.log("youpi");
@@ -425,7 +428,7 @@ export default {
 			} else if (availnow == "Technique") {
 				this.newavailable = "dispo";
 			} else {
-				console.log("la personne dopit avoir un status 'dispo' pour être confirmé !");
+				console.log("la personne doit avoir un status 'dispo' pour être confirmé !");
 			}
 			axios({
 				method: "put",
@@ -435,9 +438,9 @@ export default {
 					availid +
 					"/" +
 					this.newavailable,
-				// headers: {
-				// 	Authorization: `Bearer ${this.token}`,
-				// },
+				headers: {
+					Authorization: `Bearer ${this.token}`,
+				},
 			}).then(() => {
 				location.reload();
 			});
@@ -454,12 +457,10 @@ export default {
 			console.log("sessionId = " + sessionid);
 			console.log("availId = " + avail_id);
 			if (avail == null) {
-				this.createStatus(this.volunId, sessionid);
-				//! volunteerId = volunteerId de Vuex
+				this.createStatus(this.volunteerId, sessionid);
 				console.log("il faut créer une nouvelle entrée dans la table availabilitues");
 			} else {
-				if (this.volunId == process.env.VUE_APP_ADMIN && this.admin_change === true) {
-					//! volunId de Vueex
+				if (this.admin === 1 && this.admin_change === true) {
 					this.adminStatus(avail_id, avail);
 					console.log("l'admin va changer le status !");
 				} else {
@@ -489,15 +490,13 @@ export default {
 		//* Get total of volunteers who do Technique and Accueil by session
 		getTotalVolunteers: function () {
 			this.totalVolunteers = [];
-
-			//! rechercher les sessions avec get, puis ordre croissant du tabl sur les id session
 			// get all sessions
 			axios({
 				method: "get",
 				url: process.env.VUE_APP_API + "session/getallsessions ",
-				// headers: {
-				// 	Authorization: `Bearer ${this.token}`,
-				// },
+				headers: {
+					Authorization: `Bearer ${this.token}`,
+				},
 			}).then((sess) => {
 				for (let s = 0; s < sess.data.length; s++) {
 					axios({
@@ -507,9 +506,9 @@ export default {
 							"availability/gettotalvolunteers/" +
 							sess.data[s].id +
 							"/Technique",
-						// headers: {
-						// 	Authorization: `Bearer ${this.token}`,
-						// },
+						headers: {
+							Authorization: `Bearer ${this.token}`,
+						},
 					}).then((countTech) => {
 						axios({
 							method: "get",
@@ -518,9 +517,9 @@ export default {
 								"availability/gettotalvolunteers/" +
 								sess.data[s].id +
 								"/Accueil",
-							// headers: {
-							// 	Authorization: `Bearer ${this.token}`,
-							// },
+							headers: {
+								Authorization: `Bearer ${this.token}`,
+							},
 						}).then((countAcc) => {
 							this.totalVolunteers.push({
 								sessionid: sess.data[s].id,

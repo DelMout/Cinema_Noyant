@@ -31,7 +31,7 @@
 </template>
 <script>
 import axios from "axios";
-// import { mapMutations, mapState, mapActions } from "vuex";
+import { mapMutations, mapState, mapActions } from "vuex";
 
 export default {
 	data() {
@@ -46,11 +46,11 @@ export default {
 		this.findDatas();
 	},
 	computed: {
-		// ...mapState(["", "token", "userId", "isAdmin"]),
+		...mapState(["", "token", "userId", "isAdmin"]),
 	},
 	methods: {
-		// ...mapMutations(["setAdmin"]),
-		// ...mapActions(["checkConnect"]),
+		...mapMutations(["setAdmin"]),
+		...mapActions(["checkConnect"]),
 		//* Find datas user from jeton
 		findDatas: function () {
 			axios({
@@ -76,29 +76,33 @@ export default {
 							email: this.email,
 							password: this.password,
 						})
-						.then(() => {
-							//! put vol in variable
-							// const { userId, token, isAdmin } = vol.data;
-							// localStorage.setItem("userId", userId);
-							// localStorage.setItem("token", token);
-							// localStorage.setItem("isAdmin", isAdmin);
-							// this.setAdmin(isAdmin);
-							// this.$store.dispatch("checkConnect");
+						.then((vol) => {
+							const { volunteerId, token, isAdmin } = vol.data;
+							localStorage.setItem("volunteerId", volunteerId);
+							localStorage.setItem("token", token);
+							localStorage.setItem("isAdmin", isAdmin);
+							this.setAdmin(isAdmin);
+							this.$store.commit("setExpired", false);
+							this.$store.dispatch("checkConnect");
 
 							// update jeton
 							axios({
 								method: "put",
 								url: process.env.VUE_APP_API + "volunteer/newjeton/" + this.email,
-								// headers: {
-								// 	Authorization: `Bearer ${this.token}`,
-								// },
-							}).then(() => {
-								this.$router.push("/permanences");
-							});
+								headers: {
+									Authorization: `Bearer ${this.token}`,
+								},
+							})
+								.then(() => {
+									this.$router.push("/permanences");
+								})
+								.catch(() => {
+									this.$router.push("/permanences");
+								});
 						});
 				});
 		},
-		//* Press Enter on email cell
+		//* Press Enter on password cell
 		enter: function () {
 			this.setpassword();
 		},

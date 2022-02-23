@@ -71,8 +71,8 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import axios from "axios";
+import { mapMutations, mapState, mapActions } from "vuex";
 
 export default {
 	name: "Home",
@@ -81,12 +81,43 @@ export default {
 			email: "",
 			password: "",
 			forgot: false,
+			connectionInProgress: false,
 		};
+	},
+	beforeMount: function () {
+		this.$store.dispatch("checkConnect");
+		console.log(this.connected);
+		if (!this.connected) {
+			localStorage.clear();
+		}
+	},
+	mounted: function () {
+		if (!this.$store.state.connected && this.$store.state.expired) {
+			this.$toast.add({
+				severity: "warn",
+				detail: "Votre session a expiré.",
+				closable: false,
+				life: 4000,
+			});
+		}
 	},
 	created: function () {
 		this.deletePastSessions();
 	},
+	computed: {
+		...mapState([
+			"infoHome",
+			"token",
+			"volunteerId",
+			"isAdmin",
+			"connected",
+			"inPages",
+			"expired",
+		]),
+	},
 	methods: {
+		...mapMutations(["setUserId", "setToken", "setAdmin"]),
+		...mapActions(["checkConnect"]),
 		//* To Connect
 		toConnect: function () {
 			axios
@@ -94,22 +125,50 @@ export default {
 					email: this.email,
 					password: this.password,
 				})
-				.then(() => {
+				.then((vol) => {
 					console.log("you are connected !");
+					console.log(vol.data.volunteerId);
+					this.connectionInProgress = true;
+					const { volunteerId, token, isAdmin } = vol.data;
+					console.log(volunteerId);
+					localStorage.setItem("volunteerId", volunteerId);
+					localStorage.setItem("token", token);
+					localStorage.setItem("isAdmin", isAdmin);
+					this.setAdmin(isAdmin);
+					this.$store.commit("setExpired", false);
+					this.$store.dispatch("checkConnect");
 					// update jeton
 					axios({
 						method: "put",
 						url: process.env.VUE_APP_API + "volunteer/newjeton/" + this.email,
-						// headers: {
-						// 	Authorization: `Bearer ${this.token}`,
-						// },
-					}).then(() => {
-						this.$router.push("/permanences");
-					});
-					localStorage.clear(); // ! A mettre dans beforeMount si non connecté ensuite
+						headers: {
+							Authorization: `Bearer ${this.token}`,
+						},
+					})
+						.then(() => {
+							this.$router.push("/permanences");
+							console.log(this.connected);
+						})
+						.catch(() => {
+							this.$router.push("/permanences");
+						});
 				})
 				.catch((err) => {
-					console.log(err);
+					if (err.response.data === "Password not OK") {
+						this.$toast.add({
+							severity: "error",
+							detail: "Mot de passe incorrect !",
+							closable: false,
+							life: 4000,
+						});
+					} else {
+						this.$toast.add({
+							severity: "error",
+							detail: "Email inconnu !",
+							closable: false,
+							life: 4000,
+						});
+					}
 				});
 		},
 
@@ -143,10 +202,20 @@ export default {
 
 		//* Delete sessions if past dates
 		deletePastSessions: function () {
-			axios
-				.delete(process.env.VUE_APP_API + "session/deletepastdates ")
+			axios({
+				method: "delete",
+				url: process.env.VUE_APP_API + "session/deletepastdates ",
+				headers: {
+					Authorization: `Bearer ${this.token}`,
+				},
+			})
 				.then(() => {})
 				.catch(() => {});
+		},
+
+		//* Press Enter on password cell
+		enter: function () {
+			this.toConnect();
 		},
 	},
 };

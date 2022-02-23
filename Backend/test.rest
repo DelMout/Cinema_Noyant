@@ -1,7 +1,7 @@
 ### create a new subscriber ###
 POST http://localhost:3001/api/subscriber/create
 content-type: application/json
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2b2x1bnRlZXJJZCI6NCwiaXNBZG1pbiI6MSwiaWF0IjoxNjQ1NjExNTQxLCJleHAiOjE2NDU2MTUxNDF9.AfLs9lryCnpe0H7du_81yUN1Sqhi0kdL0GjXbthC_Bs
 
 {
     "email": "dlphn@hotmail.fr",
@@ -15,13 +15,13 @@ GET http://localhost:3001/api/subscriber/getallsubs
 ### create a new volunteer ###
 POST http://localhost:3001/api/volunteer/create
 content-type: application/json
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2b2x1bnRlZXJJZCI6NCwiaXNBZG1pbiI6MSwiaWF0IjoxNjQ1NjExNTQxLCJleHAiOjE2NDU2MTUxNDF9.AfLs9lryCnpe0H7du_81yUN1Sqhi0kdL0GjXbthC_Bs
 
 {
-    "email": "dlphn@hotmail.fr",
-    "last_name": "Mout",
-    "first_name": "Delphine",
-    "password":"DDDddd1111"
+    "email": "toto@blablabla.net",
+    "last_name": "Toto",
+    "first_name": "Msieur",
+    "password":"TTTttt1111"
 }
 
 ### see all volunteers ###

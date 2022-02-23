@@ -17,8 +17,9 @@ import Password from "primevue/password";
 import "primevue/resources/themes/saga-orange/theme.css"; //theme
 import "primevue/resources/primevue.min.css"; //core css
 import "primeicons/primeicons.css"; //icons
+import store from './store'
 
-createApp(App)
+createApp(App).use(store)
 	.use(PrimeVue)
 	.use(ConfirmationService)
 	.component("Dialog", Dialog)
