@@ -28,6 +28,6 @@ router.get("/fromjeton/:jeton", volunteerCtrl.jeton);
 router.post("/emailpassword/:email", volunteerCtrl.emailPassword);
 
 // * send email to all volunteers
-router.post("/emailinfo", volunteerCtrl.emailInfo); //! Admin
+router.post("/emailinfo", admin, volunteerCtrl.emailInfo); //! Admin
 
 module.exports = router;

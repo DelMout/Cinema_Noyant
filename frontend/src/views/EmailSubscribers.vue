@@ -130,10 +130,7 @@
 </template>
 <script>
 import axios from "axios";
-// import FormData from "form-data";
-// import fse from "fs-extra";
-// import fs from "fs";
-// import { getAllFilesSync } from "get-all-files";
+import { mapState, mapActions } from "vuex";
 
 export default {
 	data() {
@@ -146,69 +143,69 @@ export default {
 			filename: "",
 		};
 	},
+	computed: {
+		...mapState(["token", "connected"]),
+	},
 	methods: {
-		//* Show all available images (movie poster)
-		showImages: function () {},
-
+		...mapActions(["checkConnect"]),
 		//* Send email to all subscribers
 		sendEmail: function () {
 			console.log(this.filename);
-			// const formData = new FormData();
-			// // formData.append("image", this.image);
-			// formData.append("title", this.object);
-			// formData.append("content", this.body);
-
-			// If no poster selected OR title OR contenu do not continue
-			if (this.object == "") {
-				this.$toast.add({
-					severity: "error",
-					detail: "Merci d'écrire un objet à votre email.",
-					closable: false,
-					life: 4000,
-				});
-			} else if (this.body == "") {
-				this.$toast.add({
-					severity: "error",
-					detail: "Merci d'écrire un contenu dans le corps de votre email.",
-					closable: false,
-					life: 4000,
-				});
-			} else if (this.filename == "") {
-				this.$toast.add({
-					severity: "error",
-					detail: "Merci de sélectionner un affiche.",
-					closable: false,
-					life: 4000,
-				});
-
-				console.log("g compris le message !");
+			this.$store.dispatch("checkConnect");
+			if (!this.connected) {
+				this.$router.push("/");
 			} else {
-				this.emailSent = true;
-				axios({
-					method: "post",
-					url: process.env.VUE_APP_API + "subscriber/sendemail",
-					data: {
-						title: this.object,
-						content: this.body,
-						filename: this.filename,
-					},
-					// data: formData,
-					// headers: {
-					// 	Authorization: `Bearer ${this.token}`,
-					// },
-				})
-					.then(() => {
-						this.dialog = true;
-						this.emailSent = false;
-					})
-					.catch(() => {
-						this.$toast.add({
-							severity: "error",
-							detail: "Un problème est survenu. L'envoi de l'email n'a pas été effectué.",
-							closable: false,
-							life: 4000,
-						});
+				// If no poster selected OR title OR contenu do not continue
+				if (this.object == "") {
+					this.$toast.add({
+						severity: "error",
+						detail: "Merci d'écrire un objet à votre email.",
+						closable: false,
+						life: 4000,
 					});
+				} else if (this.body == "") {
+					this.$toast.add({
+						severity: "error",
+						detail: "Merci d'écrire un contenu dans le corps de votre email.",
+						closable: false,
+						life: 4000,
+					});
+				} else if (this.filename == "") {
+					this.$toast.add({
+						severity: "error",
+						detail: "Merci de sélectionner un affiche.",
+						closable: false,
+						life: 4000,
+					});
+
+					console.log("g compris le message !");
+				} else {
+					this.emailSent = true;
+					axios({
+						method: "post",
+						url: process.env.VUE_APP_API + "subscriber/sendemail",
+						data: {
+							title: this.object,
+							content: this.body,
+							filename: this.filename,
+						},
+						headers: {
+							Authorization: `Bearer ${this.token}`,
+						},
+					})
+						.then(() => {
+							this.dialog = true;
+							this.emailSent = false;
+						})
+						.catch(() => {
+							this.$toast.add({
+								severity: "error",
+								detail: "Un problème est survenu. L'envoi de l'email n'a pas été effectué.",
+								closable: false,
+								life: 4000,
+							});
+						});
+				}
 			}
 		},
 
@@ -221,39 +218,36 @@ export default {
 		//* Select a photo
 		onFileChange: function (event) {
 			this.image = event.target.files[0];
-			// var path = this.image.webkitRelativePath;
-			// var path = (window.URL || window.webkitURL).createObjectURL(this.image);
-
-			// const image = this.image;
-			// const files = event.target.files;
-			console.log(this.image);
-			console.log(this.image.name);
-			// console.log(path);
 		},
 
 		//*Save the file
 		saveFile: function () {
 			console.log("save file");
 			console.log(this.image.name);
-			const formData = new FormData();
-			formData.append("image", this.image.name);
-			axios({
-				method: "post",
-				url: process.env.VUE_APP_API + "subscriber/saveimage",
-				data: formData,
+			this.$store.dispatch("checkConnect");
+			if (!this.connected) {
+				this.$router.push("/");
+			} else {
+				const formData = new FormData();
+				formData.append("image", this.image.name);
+				axios({
+					method: "post",
+					url: process.env.VUE_APP_API + "subscriber/saveimage",
+					data: formData,
 
-				headers: {
-					content_type: "multipart/form-data",
-					// Authorization: `Bearer ${this.token}`,
-				},
-			})
-				.then((rep) => {
-					console.log(rep);
-					location.reload();
+					headers: {
+						content_type: "multipart/form-data",
+						Authorization: `Bearer ${this.token}`,
+					},
 				})
-				.catch((err) => {
-					console.log(err);
-				});
+					.then((rep) => {
+						console.log(rep);
+						location.reload();
+					})
+					.catch((err) => {
+						console.log(err);
+					});
+			}
 		},
 
 		//* Select the  movie poster

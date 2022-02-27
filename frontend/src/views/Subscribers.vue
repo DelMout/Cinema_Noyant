@@ -54,6 +54,7 @@
 </template>
 <script>
 import axios from "axios";
+import { mapState, mapActions } from "vuex";
 
 export default {
 	data() {
@@ -65,58 +66,72 @@ export default {
 			dialog: false,
 		};
 	},
+	computed: {
+		...mapState(["token", "connected"]),
+	},
 	beforeCreate: function () {
 		this.subscribers = [];
 	},
 	created: function () {
 		//* All subscribers
-		axios({
-			method: "get",
-			url: process.env.VUE_APP_API + "subscriber/getallsubs",
-			// headers: {
-			// 	Authorization: `Bearer ${this.token}`,
-			// },
-		}).then((subs) => {
-			console.log(subs.data.length);
-			for (let s = 0; s < subs.data.length; s++) {
-				this.subscribers.push({
-					last_name: subs.data[s].last_name,
-					first_name: subs.data[s].first_name,
-					email: subs.data[s].email,
-				});
-				// sort alpha order
-				this.subscribers.sort(function (a, b) {
-					var nameA = a.last_name.toUpperCase();
-					var nameB = b.last_name.toUpperCase();
+		this.$store.dispatch("checkConnect");
+		if (!this.connected) {
+			this.$router.push("/");
+		} else {
+			axios({
+				method: "get",
+				url: process.env.VUE_APP_API + "subscriber/getallsubs",
+				headers: {
+					Authorization: `Bearer ${this.token}`,
+				},
+			}).then((subs) => {
+				console.log(subs.data.length);
+				for (let s = 0; s < subs.data.length; s++) {
+					this.subscribers.push({
+						last_name: subs.data[s].last_name,
+						first_name: subs.data[s].first_name,
+						email: subs.data[s].email,
+					});
+					// sort alpha order
+					this.subscribers.sort(function (a, b) {
+						var nameA = a.last_name.toUpperCase();
+						var nameB = b.last_name.toUpperCase();
 
-					if (nameA < nameB) {
-						return -1;
-					}
-					if (nameA > nameB) {
-						return 1;
-					}
-					return 0;
-				});
-			}
-		});
+						if (nameA < nameB) {
+							return -1;
+						}
+						if (nameA > nameB) {
+							return 1;
+						}
+						return 0;
+					});
+				}
+			});
+		}
 	},
 	methods: {
+		...mapActions(["checkConnect"]),
 		//* Create a new subscriber
 		createSubscriber: function () {
-			axios({
-				method: "post",
-				url: process.env.VUE_APP_API + "subscriber/create",
-				data: {
-					email: this.email,
-					last_name: this.last_name,
-					first_name: this.first_name,
-				},
-				// headers: {
-				// 	Authorization: `Bearer ${this.token}`,
-				// },
-			}).then(() => {
-				this.dialog = true;
-			});
+			this.$store.dispatch("checkConnect");
+			if (!this.connected) {
+				this.$router.push("/");
+			} else {
+				axios({
+					method: "post",
+					url: process.env.VUE_APP_API + "subscriber/create",
+					data: {
+						email: this.email,
+						last_name: this.last_name,
+						first_name: this.first_name,
+					},
+					headers: {
+						Authorization: `Bearer ${this.token}`,
+					},
+				}).then(() => {
+					this.dialog = true;
+				});
+			}
 		},
 
 		//* Close dialog box

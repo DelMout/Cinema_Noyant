@@ -140,12 +140,24 @@
 				</tr>
 			</table>
 		</div>
+		<div style="width: 30vw">
+			<Toast position="center" :breakpoints="{ '500px': { width: '90%' } }">
+				<template #message="slotProps">
+					<div class="p-d-flex">
+						<div class="p-text-center">
+							<i class="pi pi-exclamation-triangle" style="font-size: 2rem"></i>
+							<p class="p-text-center">{{ slotProps.message.detail }}</p>
+						</div>
+					</div>
+				</template>
+			</Toast>
+		</div>
 	</div>
 </template>
 <script>
 import axios from "axios";
 import moment from "moment";
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
 	data() {
@@ -191,7 +203,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapState(["volunteerId", "token"]),
+		...mapState(["volunteerId", "token", "connected"]),
 	},
 	created: function () {
 		//* Display all volunteers, Sessions and Permanences
@@ -215,6 +227,7 @@ export default {
 	},
 
 	methods: {
+		...mapActions(["checkConnect"]),
 		//* Get French date
 		dateFr: function (date) {
 			moment.locale("fr");
@@ -223,75 +236,72 @@ export default {
 
 		//* Table of next sessions
 		getSessions: function () {
-			this.sessions = [];
-			axios({
-				method: "get",
-				url: process.env.VUE_APP_API + "session/getallsessions",
-				headers: {
-					Authorization: `Bearer ${this.token}`,
-				},
-			}).then((sess) => {
-				for (let s = 0; s < sess.data.length; s++) {
-					this.sessions.push({
-						id: sess.data[s].id,
-						date: sess.data[s].date,
-						time_perma: sess.data[s].time_perma,
-						time_seance: sess.data[s].time_seance,
-					});
-				}
-			});
+			this.$store.dispatch("checkConnect");
+			if (!this.connected) {
+				this.$router.push("/");
+			} else {
+				this.sessions = [];
+				axios({
+					method: "get",
+					url: process.env.VUE_APP_API + "session/getallsessions",
+					headers: {
+						Authorization: `Bearer ${this.token}`,
+					},
+				}).then((sess) => {
+					for (let s = 0; s < sess.data.length; s++) {
+						this.sessions.push({
+							id: sess.data[s].id,
+							date: sess.data[s].date,
+							time_perma: sess.data[s].time_perma,
+							time_seance: sess.data[s].time_seance,
+						});
+					}
+				});
+			}
 		},
 
 		//* Get permanences
 		getPermanences: function () {
-			this.permanences = [];
-			this.available_volun = [];
+			this.$store.dispatch("checkConnect");
+			if (!this.connected) {
+				this.$router.push("/");
+			} else {
+				this.permanences = [];
+				this.available_volun = [];
 
-			// get all volunteers
-			axios({
-				method: "get",
-				url: process.env.VUE_APP_API + "volunteer/getallvolunteers",
-				headers: {
-					Authorization: `Bearer ${this.token}`,
-				},
-			}).then((vol) => {
-				for (let v = 0; v < vol.data.length; v++) {
-					//!
-					// get all sessions
-					axios({
-						method: "get",
-						url: process.env.VUE_APP_API + "session/getallsessions ",
-						headers: {
-							Authorization: `Bearer ${this.token}`,
-						},
-					}).then((sess) => {
-						this.qty_sessions = sess.data.length;
-						if (this.qty_sessions === 0) {
-							//do nothing
-						} else {
-							if (this.qty_sessions > 1) {
-								this.sec_session = 1;
-							}
-							if (this.qty_sessions > 2) {
-								this.third_session = 2;
-							}
-							if (this.qty_sessions > 3) {
-								this.fourth_session = 3;
-							}
+				// get all volunteers
+				axios({
+					method: "get",
+					url: process.env.VUE_APP_API + "volunteer/getallvolunteers",
+					headers: {
+						Authorization: `Bearer ${this.token}`,
+					},
+				}).then((vol) => {
+					for (let v = 0; v < vol.data.length; v++) {
+						//!
+						// get all sessions
+						axios({
+							method: "get",
+							url: process.env.VUE_APP_API + "session/getallsessions ",
+							headers: {
+								Authorization: `Bearer ${this.token}`,
+							},
+						}).then((sess) => {
+							this.qty_sessions = sess.data.length;
+							if (this.qty_sessions === 0) {
+								//do nothing
+							} else {
+								if (this.qty_sessions > 1) {
+									this.sec_session = 1;
+								}
+								if (this.qty_sessions > 2) {
+									this.third_session = 2;
+								}
+								if (this.qty_sessions > 3) {
+									this.fourth_session = 3;
+								}
 
-							// get each permanence
-							axios({
-								method: "get",
-								url:
-									process.env.VUE_APP_API +
-									"availability/getavailable/" +
-									vol.data[v].id +
-									"/" +
-									sess.data[this.first_session].id,
-								headers: {
-									Authorization: `Bearer ${this.token}`,
-								},
-							}).then((availun) => {
+								// get each permanence
 								axios({
 									method: "get",
 									url:
@@ -299,11 +309,11 @@ export default {
 										"availability/getavailable/" +
 										vol.data[v].id +
 										"/" +
-										sess.data[this.sec_session].id,
+										sess.data[this.first_session].id,
 									headers: {
 										Authorization: `Bearer ${this.token}`,
 									},
-								}).then((availde) => {
+								}).then((availun) => {
 									axios({
 										method: "get",
 										url:
@@ -311,11 +321,11 @@ export default {
 											"availability/getavailable/" +
 											vol.data[v].id +
 											"/" +
-											sess.data[this.third_session].id,
+											sess.data[this.sec_session].id,
 										headers: {
 											Authorization: `Bearer ${this.token}`,
 										},
-									}).then((availtr) => {
+									}).then((availde) => {
 										axios({
 											method: "get",
 											url:
@@ -323,150 +333,187 @@ export default {
 												"availability/getavailable/" +
 												vol.data[v].id +
 												"/" +
-												sess.data[this.fourth_session].id,
+												sess.data[this.third_session].id,
 											headers: {
 												Authorization: `Bearer ${this.token}`,
 											},
-										}).then((availqu) => {
-											this.permanences.push({
-												volun_id: vol.data[v].id,
-												name:
-													vol.data[v].first_name +
-													" " +
-													vol.data[v].last_name,
-												sess_un: {
-													avail_id: availun.data.id,
-													sess_id: sess.data[this.first_session].id,
-													avail: availun.data.available,
+										}).then((availtr) => {
+											axios({
+												method: "get",
+												url:
+													process.env.VUE_APP_API +
+													"availability/getavailable/" +
+													vol.data[v].id +
+													"/" +
+													sess.data[this.fourth_session].id,
+												headers: {
+													Authorization: `Bearer ${this.token}`,
 												},
-												sess_de: {
-													avail_id: availde.data.id,
-													sess_id: sess.data[this.sec_session].id,
-													avail: availde.data.available,
-												},
-												sess_tr: {
-													avail_id: availtr.data.id,
-													sess_id: sess.data[this.third_session].id,
-													avail: availtr.data.available,
-												},
-												sess_qu: {
-													avail_id: availqu.data.id,
-													sess_id: sess.data[this.fourth_session].id,
-													avail: availqu.data.available,
-												},
-											});
-											// sort alpha order
-											this.permanences.sort(function (a, b) {
-												var nameA = a.name;
-												var nameB = b.name;
+											}).then((availqu) => {
+												this.permanences.push({
+													volun_id: vol.data[v].id,
+													name:
+														vol.data[v].first_name +
+														" " +
+														vol.data[v].last_name,
+													sess_un: {
+														avail_id: availun.data.id,
+														sess_id: sess.data[this.first_session].id,
+														avail: availun.data.available,
+													},
+													sess_de: {
+														avail_id: availde.data.id,
+														sess_id: sess.data[this.sec_session].id,
+														avail: availde.data.available,
+													},
+													sess_tr: {
+														avail_id: availtr.data.id,
+														sess_id: sess.data[this.third_session].id,
+														avail: availtr.data.available,
+													},
+													sess_qu: {
+														avail_id: availqu.data.id,
+														sess_id: sess.data[this.fourth_session].id,
+														avail: availqu.data.available,
+													},
+												});
+												// sort alpha order
+												this.permanences.sort(function (a, b) {
+													var nameA = a.name;
+													var nameB = b.name;
 
-												if (nameA < nameB) {
-													return -1;
-												}
-												if (nameA > nameB) {
-													return 1;
-												}
-												return 0;
+													if (nameA < nameB) {
+														return -1;
+													}
+													if (nameA > nameB) {
+														return 1;
+													}
+													return 0;
+												});
 											});
 										});
 									});
 								});
-							});
-						}
-					});
-				}
-			});
-			console.log(this.permanences);
-			console.log(this.sessions);
+							}
+						});
+					}
+				});
+				console.log(this.permanences);
+				console.log(this.sessions);
+			}
 		},
 
 		//* Change the status of avail from a volunteer
 		changeStatus: function (availid, availnow) {
-			if (availnow == "dispo") {
-				this.newavailable = "indispo";
-			} else if (availnow == "indispo") {
-				this.newavailable = "dispo";
+			this.$store.dispatch("checkConnect");
+			if (!this.connected) {
+				this.$router.push("/");
+			} else {
+				if (availnow == "dispo") {
+					this.newavailable = "indispo";
+				} else if (availnow == "indispo") {
+					this.newavailable = "dispo";
+				}
+				axios({
+					method: "put",
+					url:
+						process.env.VUE_APP_API +
+						"availability/volunteermodify/" +
+						availid +
+						"/" +
+						this.newavailable,
+					headers: {
+						Authorization: `Bearer ${this.token}`,
+					},
+				}).then(() => {
+					location.reload();
+				});
 			}
-			axios({
-				method: "put",
-				url:
-					process.env.VUE_APP_API +
-					"availability/volunteermodify/" +
-					availid +
-					"/" +
-					this.newavailable,
-				headers: {
-					Authorization: `Bearer ${this.token}`,
-				},
-			}).then(() => {
-				location.reload();
-			});
 		},
 
 		//* Create a new avail from a volunteer (new line in table "availabilities")
 		createStatus: function (volunid, sessionid) {
-			axios({
-				method: "post",
-				url: process.env.VUE_APP_API + "availability/create/" + volunid + "/" + sessionid,
-				headers: {
-					Authorization: `Bearer ${this.token}`,
-				},
-			})
-				.then(() => {
-					console.log("youpi");
-					location.reload();
+			this.$store.dispatch("checkConnect");
+			if (!this.connected) {
+				this.$router.push("/");
+			} else {
+				axios({
+					method: "post",
+					url:
+						process.env.VUE_APP_API +
+						"availability/create/" +
+						volunid +
+						"/" +
+						sessionid,
+					headers: {
+						Authorization: `Bearer ${this.token}`,
+					},
 				})
-				.catch((err) => console.log(err));
+					.then(() => {
+						console.log("youpi");
+						location.reload();
+					})
+					.catch((err) => console.log(err));
+			}
 		},
 
 		//* Change the status of avail from the administrator
 		adminStatus: function (availid, availnow) {
-			if (availnow == "dispo") {
-				this.newavailable = "Accueil";
-			} else if (availnow == "Accueil") {
-				this.newavailable = "Technique";
-			} else if (availnow == "Technique") {
-				this.newavailable = "dispo";
+			this.$store.dispatch("checkConnect");
+			if (!this.connected) {
+				this.$router.push("/");
 			} else {
-				console.log("la personne doit avoir un status 'dispo' pour être confirmé !");
+				if (availnow == "dispo") {
+					this.newavailable = "Accueil";
+				} else if (availnow == "Accueil") {
+					this.newavailable = "Technique";
+				} else if (availnow == "Technique") {
+					this.newavailable = "dispo";
+				} else {
+					console.log("la personne doit avoir un status 'dispo' pour être confirmé !");
+				}
+				axios({
+					method: "put",
+					url:
+						process.env.VUE_APP_API +
+						"availability/volunteermodify/" +
+						availid +
+						"/" +
+						this.newavailable,
+					headers: {
+						Authorization: `Bearer ${this.token}`,
+					},
+				}).then(() => {
+					location.reload();
+				});
 			}
-			axios({
-				method: "put",
-				url:
-					process.env.VUE_APP_API +
-					"availability/volunteermodify/" +
-					availid +
-					"/" +
-					this.newavailable,
-				headers: {
-					Authorization: `Bearer ${this.token}`,
-				},
-			}).then(() => {
-				location.reload();
-			});
 		},
 
 		//* Click on status of permamence
 		selectAvailable: function (event, perm, sessionid, sessorder) {
-			//! Si volun_Id est diff de vuex : mess err. Tu modifies seulement tes disponibilités...
-			console.log(process.env.VUE_APP_ADMIN);
+			// selectAvailable: function (event, perm, sessionid, sessorder) {
 			var avail_id = eval(this.value_avail[sessorder].avail_id);
 			var avail = eval(this.value_avail[sessorder].avail);
-			console.log("co = " + this.value_avail[1].avail_id);
-			console.log("avail = " + avail);
-			console.log("sessionId = " + sessionid);
-			console.log("availId = " + avail_id);
-			if (avail == null) {
+			// Check if the volunteer his datas and not other one's datas
+			if (
+				perm.volun_id != this.volunteerId &&
+				(this.admin === 0 || this.admin_change === false)
+			) {
+				this.$toast.add({
+					severity: "error",
+					detail: "Vous ne pouvez modifier que les données vous concernant.",
+					closable: false,
+					life: 4000,
+				});
+			} else if (avail == null && (this.admin === 0 || this.admin_change === false)) {
 				this.createStatus(this.volunteerId, sessionid);
-				console.log("il faut créer une nouvelle entrée dans la table availabilitues");
+				//il faut créer une nouvelle entrée dans la table availabilitues
 			} else {
 				if (this.admin === 1 && this.admin_change === true) {
 					this.adminStatus(avail_id, avail);
-					console.log("l'admin va changer le status !");
 				} else {
 					this.changeStatus(avail_id, avail);
 				}
-				console.log("modifier la donnée 'available' dans la table");
 			}
 		},
 
@@ -489,60 +536,65 @@ export default {
 
 		//* Get total of volunteers who do Technique and Accueil by session
 		getTotalVolunteers: function () {
-			this.totalVolunteers = [];
-			// get all sessions
-			axios({
-				method: "get",
-				url: process.env.VUE_APP_API + "session/getallsessions ",
-				headers: {
-					Authorization: `Bearer ${this.token}`,
-				},
-			}).then((sess) => {
-				for (let s = 0; s < sess.data.length; s++) {
-					axios({
-						method: "get",
-						url:
-							process.env.VUE_APP_API +
-							"availability/gettotalvolunteers/" +
-							sess.data[s].id +
-							"/Technique",
-						headers: {
-							Authorization: `Bearer ${this.token}`,
-						},
-					}).then((countTech) => {
+			this.$store.dispatch("checkConnect");
+			if (!this.connected) {
+				this.$router.push("/");
+			} else {
+				this.totalVolunteers = [];
+				// get all sessions
+				axios({
+					method: "get",
+					url: process.env.VUE_APP_API + "session/getallsessions ",
+					headers: {
+						Authorization: `Bearer ${this.token}`,
+					},
+				}).then((sess) => {
+					for (let s = 0; s < sess.data.length; s++) {
 						axios({
 							method: "get",
 							url:
 								process.env.VUE_APP_API +
 								"availability/gettotalvolunteers/" +
 								sess.data[s].id +
-								"/Accueil",
+								"/Technique",
 							headers: {
 								Authorization: `Bearer ${this.token}`,
 							},
-						}).then((countAcc) => {
-							this.totalVolunteers.push({
-								sessionid: sess.data[s].id,
-								count: { Technique: countTech.data, Accueil: countAcc.data },
-							});
-							// sort alpha order
-							this.totalVolunteers.sort(function (a, b) {
-								var idA = a.sessionid;
-								var idB = b.sessionid;
+						}).then((countTech) => {
+							axios({
+								method: "get",
+								url:
+									process.env.VUE_APP_API +
+									"availability/gettotalvolunteers/" +
+									sess.data[s].id +
+									"/Accueil",
+								headers: {
+									Authorization: `Bearer ${this.token}`,
+								},
+							}).then((countAcc) => {
+								this.totalVolunteers.push({
+									sessionid: sess.data[s].id,
+									count: { Technique: countTech.data, Accueil: countAcc.data },
+								});
+								// sort alpha order
+								this.totalVolunteers.sort(function (a, b) {
+									var idA = a.sessionid;
+									var idB = b.sessionid;
 
-								if (idA < idB) {
-									return -1;
-								}
-								if (idA > idB) {
-									return 1;
-								}
-								return 0;
+									if (idA < idB) {
+										return -1;
+									}
+									if (idA > idB) {
+										return 1;
+									}
+									return 0;
+								});
 							});
 						});
-					});
-				}
-				console.log(this.totalVolunteers);
-			});
+					}
+					console.log(this.totalVolunteers);
+				});
+			}
 		},
 	},
 };

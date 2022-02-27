@@ -5,11 +5,11 @@
 			<router-link v-if="connected" to="/permanences">Permanences</router-link>
 		</div>
 		<div id="admin">
-			<router-link to="/abonnes">Abonnés</router-link>
-			<router-link to="/email_abonnes">Email Abonnés</router-link>
-			<router-link to="/selection_seances">Séances</router-link>
-			<router-link to="/email_benevoles">Email Bénévoles</router-link>
-			<router-link v-if="connected" to="/decon" @click="disconnect">Déconnexion</router-link>
+			<router-link v-if="isAdminApp === 1" to="/abonnes">Abonnés</router-link>
+			<router-link v-if="isAdminApp === 1" to="/email_abonnes">Email Abonnés</router-link>
+			<router-link v-if="isAdminApp === 1" to="/selection_seances">Séances</router-link>
+			<router-link v-if="isAdminApp === 1" to="/email_benevoles">Email Bénévoles</router-link>
+			<a href="/" v-if="connected" @click="disconnect">Déconnexion</a>
 		</div>
 	</div>
 	<div id="router"><router-view /></div>
@@ -24,7 +24,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapState(["connected"]),
+		...mapState(["connected", "isAdmin"]),
 	},
 	beforeMount: function () {
 		this.$store.dispatch("checkConnect");
@@ -41,7 +41,7 @@ export default {
 		disconnect: function () {
 			localStorage.clear();
 			this.$store.dispatch("disconnect");
-			this.$router.push("/");
+			// this.$router.push("/");
 		},
 	},
 };

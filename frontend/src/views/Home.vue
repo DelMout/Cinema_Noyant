@@ -137,6 +137,7 @@ export default {
 					this.setAdmin(isAdmin);
 					this.$store.commit("setExpired", false);
 					this.$store.dispatch("checkConnect");
+
 					// update jeton
 					axios({
 						method: "put",
@@ -205,9 +206,9 @@ export default {
 			axios({
 				method: "delete",
 				url: process.env.VUE_APP_API + "session/deletepastdates ",
-				headers: {
-					Authorization: `Bearer ${this.token}`,
-				},
+				// headers: {
+				// 	Authorization: `Bearer ${this.token}`,
+				// },
 			})
 				.then(() => {})
 				.catch(() => {});

@@ -63,6 +63,7 @@
 </template>
 <script>
 import axios from "axios";
+import { mapState, mapActions } from "vuex";
 
 export default {
 	data() {
@@ -73,49 +74,58 @@ export default {
 			dialog: false,
 		};
 	},
+	computed: {
+		...mapState(["token", "connected"]),
+	},
 	methods: {
+		...mapActions(["checkConnect"]),
 		//* Send email to all volunteers
 		sendEmail: function () {
-			// If no poster selected OR title OR contenu do not continue
-			if (this.object == "") {
-				this.$toast.add({
-					severity: "error",
-					detail: "Merci d'écrire un objet à votre email.",
-					closable: false,
-					life: 4000,
-				});
-			} else if (this.body == "") {
-				this.$toast.add({
-					severity: "error",
-					detail: "Merci d'écrire un contenu dans le corps de votre email.",
-					closable: false,
-					life: 4000,
-				});
+			this.$store.dispatch("checkConnect");
+			if (!this.connected) {
+				this.$router.push("/");
 			} else {
-				this.emailSent = true;
-				axios({
-					method: "post",
-					url: process.env.VUE_APP_API + "volunteer/emailinfo",
-					data: {
-						title: this.object,
-						content: this.body,
-					},
-					// headers: {
-					// 	Authorization: `Bearer ${this.token}`,
-					// },
-				})
-					.then(() => {
-						this.dialog = true;
-						this.emailSent = false;
-					})
-					.catch(() => {
-						this.$toast.add({
-							severity: "error",
-							detail: "Un problème est survenu. L'envoi de l'email n'a pas été effectué.",
-							closable: false,
-							life: 4000,
-						});
+				// If no poster selected OR title OR contenu do not continue
+				if (this.object == "") {
+					this.$toast.add({
+						severity: "error",
+						detail: "Merci d'écrire un objet à votre email.",
+						closable: false,
+						life: 4000,
 					});
+				} else if (this.body == "") {
+					this.$toast.add({
+						severity: "error",
+						detail: "Merci d'écrire un contenu dans le corps de votre email.",
+						closable: false,
+						life: 4000,
+					});
+				} else {
+					this.emailSent = true;
+					axios({
+						method: "post",
+						url: process.env.VUE_APP_API + "volunteer/emailinfo",
+						data: {
+							title: this.object,
+							content: this.body,
+						},
+						headers: {
+							Authorization: `Bearer ${this.token}`,
+						},
+					})
+						.then(() => {
+							this.dialog = true;
+							this.emailSent = false;
+						})
+						.catch(() => {
+							this.$toast.add({
+								severity: "error",
+								detail: "Un problème est survenu. L'envoi de l'email n'a pas été effectué.",
+								closable: false,
+								life: 4000,
+							});
+						});
+				}
 			}
 		},
 

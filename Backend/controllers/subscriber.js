@@ -70,7 +70,7 @@ exports.sendEmail = (req, res) => {
 					(error, info) => {
 						//! A revoir ci-dessous qd on sera en https
 						if (error) {
-							console.log("ya un probleme");
+							console.log(error);
 							// res.status(401).send(error);
 							// return;
 						} else {

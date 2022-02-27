@@ -83,20 +83,6 @@
 						</div>
 					</td>
 				</tr>
-				<!-- <tr id="emplac_button">
-					<td colspan="3">
-						<div v-if="!sessionSaved">
-							<Button
-								label="Créer cette séance"
-								class="p-button-raised p-button-primary save"
-								@click="saveSession"
-							/>
-						</div>
-						<div v-if="sessionSaved">
-							<ProgressSpinner />
-						</div>
-					</td>
-				</tr> -->
 			</table>
 		</div>
 		<div>
@@ -121,6 +107,7 @@
 <script>
 import axios from "axios";
 import moment from "moment";
+import { mapState, mapActions } from "vuex";
 
 export default {
 	data() {
@@ -133,10 +120,14 @@ export default {
 			sessions: [],
 		};
 	},
+	computed: {
+		...mapState(["volunteerId", "token", "connected"]),
+	},
 	created: function () {
 		this.getAllSessions();
 	},
 	methods: {
+		...mapActions(["checkConnect"]),
 		//* Get French date
 		dateFr: function (date) {
 			moment.locale("fr");
@@ -145,8 +136,18 @@ export default {
 
 		//* Get all sessions
 		getAllSessions: function () {
-			(this.sessions = []),
-				axios.get(process.env.VUE_APP_API + "session/getallsessions").then((sess) => {
+			this.$store.dispatch("checkConnect");
+			if (!this.connected) {
+				this.$router.push("/");
+			} else {
+				this.sessions = [];
+				axios({
+					method: "get",
+					url: process.env.VUE_APP_API + "session/getallsessions",
+					headers: {
+						Authorization: `Bearer ${this.token}`,
+					},
+				}).then((sess) => {
 					for (let s = 0; s < sess.data.length; s++) {
 						this.sessions.push({
 							id: sess.data[s].id,
@@ -156,22 +157,39 @@ export default {
 						});
 					}
 				});
+			}
 		},
 
 		//* Create a new session
 		saveSession: function () {
-			this.sessionSaved = true;
-			axios
-				.post(process.env.VUE_APP_API + "session/create", {
-					date: this.date,
-					time_perma: this.time_perma,
-					time_seance: this.time_seance,
-				})
-				.then(() => {
+			this.$store.dispatch("checkConnect");
+			if (!this.connected) {
+				this.$router.push("/");
+			} else {
+				this.sessionSaved = true;
+				// axios
+				// 	.post(process.env.VUE_APP_API + "session/create", {
+				// 		date: this.date,
+				// 		time_perma: this.time_perma,
+				// 		time_seance: this.time_seance,
+				// 	})
+				axios({
+					method: "post",
+					url: process.env.VUE_APP_API + "session/create",
+					data: {
+						date: this.date,
+						time_perma: this.time_perma,
+						time_seance: this.time_seance,
+					},
+					headers: {
+						Authorization: `Bearer ${this.token}`,
+					},
+				}).then(() => {
 					console.log("session saved !");
 					this.sessionSaved = false;
 					this.dialog = true;
 				});
+			}
 		},
 
 		//* Close dialog box
@@ -196,9 +214,20 @@ export default {
 
 		//* Delete a session
 		deleteSession: function (event, sess) {
-			axios.delete(process.env.VUE_APP_API + "session/delete/" + sess.id).then(() => {
-				location.reload();
-			});
+			this.$store.dispatch("checkConnect");
+			if (!this.connected) {
+				this.$router.push("/");
+			} else {
+				axios({
+					method: "delete",
+					url: process.env.VUE_APP_API + "session/delete/" + sess.id,
+					headers: {
+						Authorization: `Bearer ${this.token}`,
+					},
+				}).then(() => {
+					location.reload();
+				});
+			}
 		},
 	},
 };
