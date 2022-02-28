@@ -37,6 +37,6 @@ router.get("/getallsubs", admin, subCtrl.getAllSubs); //!  admin
 router.post("/sendemail", admin, subCtrl.sendEmail); //! Admin
 
 // * save file
-router.post("/saveimage", admin, subCtrl.saveImage); //! Admin
+router.get("/saveimage", admin, subCtrl.saveImage); //! Admin
 
 module.exports = router;

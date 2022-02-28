@@ -24,6 +24,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2b2x1bnRlZXJJZCI6N
     "password":"TTTttt1111"
 }
 
+### create a new volunteer ###
+POST https://api.cinema.noyant.delmout.com/api/volunteer/create
+content-type: application/json
+
+
+{
+    "email": "dlphn@hotmail.fr",
+    "last_name": "Moutault",
+    "first_name": "Delphine",
+    "password":"DDDddd1111"
+}
+
 ### see all volunteers ###
 GET http://localhost:3001/api/volunteer/getallvolunteers 
 

@@ -142,7 +142,7 @@ exports.emailPassword = (req, res) => {
 						nom +
 						",</p></br>" +
 						message +
-						"</br><a href='http://localhost:8080/setpassword/" +
+						"</br><a href='https://cinema.noyant.delmout.com/setpassword/" +
 						jeton +
 						"'>Saisir un nouveau mot de passe</a></br></br><p>Merci de ne pas répondre à cet email.</p>",
 				},
@@ -199,7 +199,7 @@ exports.emailInfo = (req, res) => {
 						subject: "[Cinéma Noyant] " + req.body.title,
 						html:
 							req.body.content +
-							"<br/><a href='http://localhost:8080/'>Voir les permanences des bénévoles</a><br/><br/><p>Merci de ne pas répondre à cet email</p><p>L'administration de l'équipe Cinéma de Noyant</p>",
+							"<br/><a href='https://cinema.noyant.delmout.com'>Voir les permanences des bénévoles</a><br/><br/><p>Merci de ne pas répondre à cet email</p><p>L'administration de l'équipe Cinéma de Noyant</p>",
 					},
 					(error, info) => {
 						if (error) {

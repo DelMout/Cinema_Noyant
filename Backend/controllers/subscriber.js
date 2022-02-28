@@ -44,8 +44,6 @@ exports.sendEmail = (req, res) => {
 	subscriber
 		.findAndCountAll()
 		.then((subscribers) => {
-			// const affiche = affiche.jpg;
-
 			const count = subscribers.count;
 			for (let i = 0; i < count; i++) {
 				// Message for each subscriber
@@ -56,7 +54,6 @@ exports.sendEmail = (req, res) => {
 						subject: "[Cinéma Noyant] " + req.body.title,
 						html:
 							req.body.content +
-							// "<br/><br/><p>Merci de ne pas répondre à cet email</p><p>L'équipe Cinéma Noyant<br/>Familles Rurales</p>",
 							"<img style='width:250px;margin-top:10px' src='cid:affiche@cinema.com'/><br/><br/><p>Merci de ne pas répondre à cet email</p><p>L'équipe Cinéma Noyant<br/>Familles Rurales</p>",
 						attachments: [
 							{
@@ -70,8 +67,8 @@ exports.sendEmail = (req, res) => {
 					(error, info) => {
 						//! A revoir ci-dessous qd on sera en https
 						if (error) {
-							console.log(error);
-							// res.status(401).send(error);
+							// console.log(error);
+							res.status(401).send(error);
 							// return;
 						} else {
 							res.status(200).send("email envoyé à tous !");
@@ -90,9 +87,28 @@ exports.sendEmail = (req, res) => {
 //* Save an image
 exports.saveImage = (req, res) => {
 	console.log(req.body.image);
-	fse.copySync(
-		"E:/PROJET NUM 2020/Cinema_Noyant/Affiches/" + req.body.image,
-		"./images/" + req.body.image
-	);
-	res.status(200).send("image uploaded !!");
+	// fse.copySync(
+	// 	"E:/PROJET NUM 2020/Cinema_Noyant/Affiches/" + req.body.image,
+	// 	"./images/" + req.body.image
+	// );
+	// res.status(200).send("image uploaded !!");
+
+	if (!req.files) {
+		res.send({
+			status: false,
+			message: "No file uploaded",
+		});
+	} else {
+		let image = req.files.image;
+		image.mv("./images/" + image.name);
+		res.send({
+			status: true,
+			message: "File is uploaded",
+			data: {
+				name: image.name,
+				mimetype: image.mimetype,
+				size: image.size,
+			},
+		});
+	}
 };

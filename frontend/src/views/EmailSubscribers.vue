@@ -42,7 +42,7 @@
 					<div id="poster">
 						<div class="post_butt">
 							<img
-								src="http://localhost:3001/images/affiche_un.jpg"
+								src="https://api.cinema.noyant.delmout.com/images/affiche_un.jpg"
 								alt="affiche cinéma"
 								crossorigin="anonymous"
 								width="250"
@@ -50,16 +50,10 @@
 								id="first"
 								@click="selectOne"
 							/>
-							<!-- <Button
-							v-if="filename != 'affiche_un.jpg'"
-							label="Sélectionner cette affiche"
-							class="p-button-raised p-button-info selec"
-							
-						/> -->
 						</div>
 						<div class="post_butt">
 							<img
-								src="http://localhost:3001/images/affiche_de.jpg"
+								src="https://api.cinema.noyant.delmout.com/images/affiche_de.jpg"
 								alt="affiche cinéma"
 								crossorigin="anonymous"
 								width="250"
@@ -67,23 +61,11 @@
 								id="second"
 								@click="selectTwo"
 							/>
-							<!-- <Button
-							v-if="filename != 'affiche_de.jpg'"
-							label="Sélectionner cette affiche"
-							class="p-button-raised p-button-info selec"
-						/> -->
 						</div>
 						<div class="post_butt" @click="selectNo">
 							<div id="no_post"><p>Ne pas joindre d'affiche</p></div>
 						</div>
 					</div>
-					<!-- <div class="post_no">
-						<Button
-							label="Sans image jointe"
-							class="p-button-raised p-button-info selec"
-							@click="selectNo"
-						/>
-					</div> -->
 				</div>
 			</div>
 			<div id="pied">
@@ -229,7 +211,8 @@ export default {
 				this.$router.push("/");
 			} else {
 				const formData = new FormData();
-				formData.append("image", this.image.name);
+				formData.append("image", this.image);
+				// formData.append("image", this.image.name);
 				axios({
 					method: "post",
 					url: process.env.VUE_APP_API + "subscriber/saveimage",

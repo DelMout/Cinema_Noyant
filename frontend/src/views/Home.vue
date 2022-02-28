@@ -1,6 +1,7 @@
 <template>
 	<div class="home">
 		<h1>Bienvenue au Cinéma de Noyant</h1>
+		<div id="screen"></div>
 		<div id="login">
 			<div>
 				<p class="p-float-label">
@@ -14,7 +15,6 @@
 					<label for="email">Email</label>
 				</p>
 				<p v-if="!forgot" class="p-float-label password">
-					<!-- <InputText class="" id="password" type="text" v-model="password" /> -->
 					<Password
 						class=" "
 						id="password"
@@ -297,5 +297,63 @@ h1 {
 	margin-bottom: 0rem;
 	margin-top: auto;
 	font-weight: bold;
+}
+/* MEDIA QUERIES */
+@media only screen and (max-width: 1500px) {
+	#screen {
+		background-color: rgb(230, 203, 203);
+		position: absolute;
+		top: 40vh;
+		left: 25vw;
+		width: 50%;
+		height: 40%;
+		z-index: 1;
+	}
+	#login {
+		position: relative;
+		z-index: 100;
+		margin-top: 32vh;
+		width: 50%;
+		margin-left: 27%;
+	}
+}
+@media only screen and (max-width: 1100px) {
+	#screen {
+		top: 35vh;
+		left: 15vw;
+		width: 70%;
+	}
+	#login {
+		margin-top: 23vh;
+		width: 60%;
+		margin-left: 20%;
+	}
+	#login > div {
+		/* background-color: blue; */
+		width: 50%;
+	}
+}
+@media only screen and (max-width: 768px) {
+	#screen {
+		left: 5vw;
+		width: 90%;
+	}
+	#login {
+		width: 80%;
+		margin-left: 10%;
+	}
+}
+@media only screen and (max-width: 576px) {
+	#screen {
+		left: 5vw;
+		width: 90%;
+	}
+	#login {
+		width: 86%;
+		margin-left: 7%;
+	}
+	#login div:nth-child(2) {
+		margin-left: 1rem;
+	}
 }
 </style>

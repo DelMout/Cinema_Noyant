@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "../views/Home.vue";
+import store from "../store/index.js";
 
 const routes = [
 	{
@@ -15,6 +16,18 @@ const routes = [
 		// this generates a separate chunk (about.[hash].js) for this route
 		// which is lazy-loaded when the route is visited.
 		component: () => import(/* webpackChunkName: "about" */ "../views/Subscribers.vue"),
+		beforeEnter: (to, from, next) => {
+			store.dispatch("checkConnect");
+			if (!store.state.connected) {
+				next({ name: "Home" });
+			} else {
+				if (localStorage.getItem("isAdmin") == 0) {
+					next({ name: "Home" });
+				} else {
+					next();
+				}
+			}
+		},
 	},
 	{
 		path: "/email_abonnes",
@@ -23,6 +36,18 @@ const routes = [
 		// this generates a separate chunk (about.[hash].js) for this route
 		// which is lazy-loaded when the route is visited.
 		component: () => import(/* webpackChunkName: "about" */ "../views/EmailSubscribers.vue"),
+		beforeEnter: (to, from, next) => {
+			store.dispatch("checkConnect");
+			if (!store.state.connected) {
+				next({ name: "Home" });
+			} else {
+				if (localStorage.getItem("isAdmin") == 0) {
+					next({ name: "Home" });
+				} else {
+					next();
+				}
+			}
+		},
 	},
 	{
 		path: "/email_benevoles",
@@ -31,6 +56,18 @@ const routes = [
 		// this generates a separate chunk (about.[hash].js) for this route
 		// which is lazy-loaded when the route is visited.
 		component: () => import(/* webpackChunkName: "about" */ "../views/EmailVolunteers.vue"),
+		beforeEnter: (to, from, next) => {
+			store.dispatch("checkConnect");
+			if (!store.state.connected) {
+				next({ name: "Home" });
+			} else {
+				if (localStorage.getItem("isAdmin") == 0) {
+					next({ name: "Home" });
+				} else {
+					next();
+				}
+			}
+		},
 	},
 	{
 		path: "/selection_seances",
@@ -39,6 +76,18 @@ const routes = [
 		// this generates a separate chunk (about.[hash].js) for this route
 		// which is lazy-loaded when the route is visited.
 		component: () => import(/* webpackChunkName: "about" */ "../views/Sessions.vue"),
+		beforeEnter: (to, from, next) => {
+			store.dispatch("checkConnect");
+			if (!store.state.connected) {
+				next({ name: "Home" });
+			} else {
+				if (localStorage.getItem("isAdmin") == 0) {
+					next({ name: "Home" });
+				} else {
+					next();
+				}
+			}
+		},
 	},
 	{
 		path: "/permanences",
@@ -47,6 +96,14 @@ const routes = [
 		// this generates a separate chunk (about.[hash].js) for this route
 		// which is lazy-loaded when the route is visited.
 		component: () => import(/* webpackChunkName: "about" */ "../views/Permanences.vue"),
+		beforeEnter: (to, from, next) => {
+			store.dispatch("checkConnect");
+			if (!store.state.connected) {
+				next({ name: "Home" });
+			} else {
+				next();
+			}
+		},
 	},
 	{
 		path: "/setpassword/:jeton",
@@ -61,6 +118,19 @@ const routes = [
 const router = createRouter({
 	history: createWebHistory(process.env.BASE_URL),
 	routes,
+});
+
+router.beforeEach((to, from, next) => {
+	store.dispatch("checkConnect");
+	if (to.meta.requiresAuth) {
+		if (!store.state.connected) {
+			next({ name: "Home" });
+		} else {
+			next();
+		}
+	} else {
+		next();
+	}
 });
 
 export default router;
